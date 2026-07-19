@@ -406,8 +406,8 @@ export function AdminDashboard() {
       </div>
 
       {selectedDapur && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="neo-card p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto relative animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-lg">
+          <div className="neo-card !shadow-none border border-black/10 p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto relative animate-in fade-in zoom-in duration-200">
             <button 
               onClick={() => setSelectedDapur(null)}
               className="absolute top-4 right-4 p-2 bg-red-100 text-red-custom rounded-full hover:scale-110 transition-transform"
