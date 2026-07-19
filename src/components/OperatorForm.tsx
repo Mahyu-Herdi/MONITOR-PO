@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useAlert } from "./AlertProvider";
+import { CustomSelect } from "./CustomSelect";
 import { Upload, Save, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { cn, formatRp, parseRp, GAS_URL } from '../lib/utils';
 
 export function OperatorForm() {
+  const { showAlert } = useAlert();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [operators, setOperators] = useState<{name: string, dapurs: string[]}[]>([]);
@@ -109,7 +112,7 @@ export function OperatorForm() {
       if (file_supplier) body.append('file_supplier', await getBase64(file_supplier));
 
       if (!GAS_URL) {
-        alert("URL Google Apps Script belum dikonfigurasi. Simulasi sukses.");
+        showAlert("URL Google Apps Script belum dikonfigurasi. Simulasi sukses.", "success");
         setSuccess(true);
         setFormData({
           operator_name: '',
@@ -146,7 +149,7 @@ export function OperatorForm() {
         formRef.current.reset();
         setTimeout(() => setSuccess(false), 3000);
       } else {
-        alert("Gagal menyimpan data");
+        showAlert("Gagal menyimpan data", "error");
       }
     } catch (error) {
       // Handle fallback success for preview when GAS fetch fails
@@ -189,34 +192,30 @@ export function OperatorForm() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Nama Operator</label>
-              <select 
+              <CustomSelect 
                 name="operator_name"
                 required
                 value={formData.operator_name}
-                onChange={handleChange}
-                className="neo-input w-full p-3 sm:p-4 rounded-xl font-bold appearance-none cursor-pointer text-sm sm:text-base min-h-[48px]"
-              >
-                <option value="">-- Pilih Operator --</option>
-                {operators.map(op => (
-                  <option key={op.name} value={op.name}>{op.name}</option>
-                ))}
-              </select>
+                onChange={(val) => {
+                  const op = operators.find(o => o.name === val);
+                  setAvailableDapurs(op ? op.dapurs : []);
+                  setFormData(prev => ({ ...prev, operator_name: val, dapur_name: '' }));
+                }}
+                options={operators.map(op => ({ value: op.name, label: op.name }))}
+                placeholder="-- Pilih Operator --"
+              />
             </div>
             <div>
               <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Nama Dapur (SPPG)</label>
-              <select 
+              <CustomSelect 
                 name="dapur_name"
                 required
                 value={formData.dapur_name}
-                onChange={handleChange}
+                onChange={(val) => setFormData(prev => ({ ...prev, dapur_name: val }))}
                 disabled={!formData.operator_name}
-                className="neo-input w-full p-3 sm:p-4 rounded-xl font-bold appearance-none cursor-pointer text-sm sm:text-base min-h-[48px]"
-              >
-                <option value="">-- Pilih Dapur --</option>
-                {availableDapurs.map(dapur => (
-                  <option key={dapur} value={dapur}>{dapur}</option>
-                ))}
-              </select>
+                options={availableDapurs.map(dapur => ({ value: dapur, label: dapur }))}
+                placeholder="-- Pilih Dapur --"
+              />
             </div>
             <div>
               <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Tanggal Distribusi</label>

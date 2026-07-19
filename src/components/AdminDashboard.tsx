@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 import { formatRp, GAS_URL, parseRp } from '../lib/utils';
+import { useAlert } from "./AlertProvider";
 import { FileText, FileSpreadsheet, X, Calendar as CalendarIcon, TrendingUp, TrendingDown, Activity, Edit2, Trash2, Save, XCircle, Loader2 } from 'lucide-react';
 
 const formatDate = (dateStr: string) => {
@@ -12,6 +13,7 @@ const formatDate = (dateStr: string) => {
 };
 
 export function AdminDashboard() {
+  const { showAlert } = useAlert();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDapur, setSelectedDapur] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export function AdminDashboard() {
       
       setData(prev => prev.filter(item => item.id !== id));
     } catch (err) {
-      alert('Gagal menghapus data');
+      showAlert('Gagal menghapus data');
     } finally {
       setIsSaving(false);
     }
@@ -109,7 +111,7 @@ export function AdminDashboard() {
       }));
       setEditingId(null);
     } catch (err) {
-      alert('Gagal menyimpan data');
+      showAlert('Gagal menyimpan data');
     } finally {
       setIsSaving(false);
     }

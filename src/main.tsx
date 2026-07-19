@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { registerSW } from 'virtual:pwa-register';
+import { AlertProvider } from './components/AlertProvider';
 
 const updateSW = registerSW({
   onNeedRefresh() {
@@ -17,6 +18,8 @@ const updateSW = registerSW({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <AlertProvider>
+      <App />
+    </AlertProvider>
   </StrictMode>,
 );
