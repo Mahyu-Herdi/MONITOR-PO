@@ -155,7 +155,7 @@ export function PublicOverview() {
           </div>
           
           {showFilter && (
-            <div className="flex items-center gap-2 clay-card-in p-2 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-2 clay-card-in p-2.5 sm:p-3 min-h-[40px] animate-in fade-in zoom-in duration-200">
               <CalendarIcon className="w-4 h-4 text-blue-custom" />
               <select 
                 value={selectedMonth}
@@ -278,51 +278,51 @@ export function PublicOverview() {
       </div>
 
       {selectedDapurData && (
-        <div className="clay-card p-4 sm:p-6 animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-extrabold text-blue-custom text-lg">Rincian: {selectedDapurData.name}</h3>
+        <div className="clay-card p-3 sm:p-6 animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg">Rincian: {selectedDapurData.name}</h3>
             <button 
               onClick={() => setSelectedDapur(null)}
-              className="text-xs font-bold text-red-500 hover:underline"
+              className="text-[10px] sm:text-xs font-bold text-red-500 hover:underline"
             >
-              Tutup Rincian
+              Tutup
             </button>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-            <div className="clay-card-in p-3">
-              <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total Pagu</span>
-              <span className="font-black text-blue-custom text-sm">Rp {formatRp(selectedDapurData.pagu)}</span>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-4 mb-3">
+            <div className="clay-card-in p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
+              <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total Pagu</span>
+              <span className="font-black text-blue-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.pagu)}</span>
             </div>
-            <div className="clay-card-in p-3">
-              <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total PO SPPG</span>
-              <span className="font-black text-blue-custom text-sm">Rp {formatRp(selectedDapurData.po_sppg)}</span>
+            <div className="clay-card-in p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
+              <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO SPPG</span>
+              <span className="font-black text-blue-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_sppg)}</span>
             </div>
-            <div className="clay-card-in p-3">
-              <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total PO Koperasi</span>
-              <span className="font-black text-green-custom text-sm">Rp {formatRp(selectedDapurData.po_koperasi)}</span>
+            <div className="clay-card-in p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
+              <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO Koperasi</span>
+              <span className="font-black text-green-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_koperasi)}</span>
             </div>
-            <div className="clay-card-in p-3">
-              <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total PO Supplier</span>
-              <span className="font-black text-red-500 text-sm">Rp {formatRp(selectedDapurData.po_supplier)}</span>
+            <div className="clay-card-in p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
+              <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO Supplier</span>
+              <span className="font-black text-red-500 text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_supplier)}</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
-            <div className="clay-card-blue p-3 flex flex-col items-center justify-center">
-              <span className="text-[9px] sm:text-[10px] text-white/80 uppercase font-bold block mb-1">Margin Utama</span>
-              <span className="font-black text-white text-sm sm:text-lg mb-1">Rp {formatRp(selectedDapurData.marginUtama)}</span>
-              <span className="text-[9px] sm:text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-full">{selectedDapurData.persentaseUtama}%</span>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-4 text-center">
+            <div className="clay-card-blue p-2 flex flex-col items-center justify-center min-h-[60px] sm:min-h-0">
+              <span className="text-[7px] sm:text-[10px] text-white/80 uppercase font-bold block mb-0.5 leading-none">Margin Utama</span>
+              <span className="font-black text-white text-[11px] sm:text-lg mb-1 leading-none mt-1">Rp {formatRp(selectedDapurData.marginUtama)}</span>
+              <span className="text-[7px] sm:text-[10px] font-bold bg-white/20 text-white px-1.5 py-0.5 rounded-full leading-none">{selectedDapurData.persentaseUtama}%</span>
             </div>
-            <div className="clay-card-green p-3 flex flex-col items-center justify-center">
-              <span className="text-[9px] sm:text-[10px] text-white/80 uppercase font-bold block mb-1">Margin Koperasi</span>
-              <span className="font-black text-white text-sm sm:text-lg mb-1">Rp {formatRp(selectedDapurData.marginKoperasi)}</span>
-              <span className="text-[9px] sm:text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-full">{selectedDapurData.persentaseKoperasi}%</span>
+            <div className="clay-card-green p-2 flex flex-col items-center justify-center min-h-[60px] sm:min-h-0">
+              <span className="text-[7px] sm:text-[10px] text-white/80 uppercase font-bold block mb-0.5 leading-none">Margin Koperasi</span>
+              <span className="font-black text-white text-[11px] sm:text-lg mb-1 leading-none mt-1">Rp {formatRp(selectedDapurData.marginKoperasi)}</span>
+              <span className="text-[7px] sm:text-[10px] font-bold bg-white/20 text-white px-1.5 py-0.5 rounded-full leading-none">{selectedDapurData.persentaseKoperasi}%</span>
             </div>
-            <div className="clay-card-emerald p-3 flex flex-col items-center justify-center">
-              <span className="text-[9px] sm:text-[10px] text-white/80 uppercase font-bold block mb-1">Margin Yayasan</span>
-              <span className="font-black text-white text-sm sm:text-lg mb-1">Rp {formatRp(selectedDapurData.marginYayasan)}</span>
-              <span className="text-[9px] sm:text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-full">{selectedDapurData.persentaseYayasan}%</span>
+            <div className="clay-card-emerald p-2 flex flex-col items-center justify-center min-h-[60px] sm:min-h-0">
+              <span className="text-[7px] sm:text-[10px] text-white/80 uppercase font-bold block mb-0.5 leading-none">Margin Yayasan</span>
+              <span className="font-black text-white text-[11px] sm:text-lg mb-1 leading-none mt-1">Rp {formatRp(selectedDapurData.marginYayasan)}</span>
+              <span className="text-[7px] sm:text-[10px] font-bold bg-white/20 text-white px-1.5 py-0.5 rounded-full leading-none">{selectedDapurData.persentaseYayasan}%</span>
             </div>
           </div>
         </div>

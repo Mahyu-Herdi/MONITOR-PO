@@ -168,33 +168,33 @@ export function OperatorForm() {
   };
 
   return (
-    <div className="clay-card p-4 sm:p-6 w-full max-w-5xl mx-auto">
-      <h2 className="text-xl font-extrabold text-blue-custom mb-6 flex items-center gap-2">
-        <Save className="w-6 h-6" />
+    <div className="clay-card p-3 sm:p-6 w-full max-w-5xl mx-auto">
+      <h2 className="text-sm sm:text-xl font-extrabold text-blue-custom mb-4 flex items-center gap-2">
+        <Save className="w-4 h-4 sm:w-6 sm:h-6" />
         Input Distribusi Dapur
       </h2>
       
       {success && (
-        <div className="bg-green-100 text-green-800 p-4 rounded-xl mb-6 font-bold text-center">
+        <div className="bg-green-100 text-green-800 p-3 rounded-xl mb-4 font-bold text-center text-xs sm:text-sm">
           Berhasil menyimpan data dan mengupload file!
         </div>
       )}
 
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
         {configLoading ? (
           <div className="flex justify-center p-8">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-custom" />
+            <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-custom" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="block text-sm font-bold text-muted mb-2">Nama Operator</label>
+              <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Nama Operator</label>
               <select 
                 name="operator_name"
                 required
                 value={formData.operator_name}
                 onChange={handleChange}
-                className="clay-input w-full p-3 rounded-xl border-none font-bold appearance-none cursor-pointer"
+                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold appearance-none cursor-pointer text-sm sm:text-base min-h-[48px]"
               >
                 <option value="">-- Pilih Operator --</option>
                 {operators.map(op => (
@@ -203,14 +203,14 @@ export function OperatorForm() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-muted mb-2">Nama Dapur (SPPG)</label>
+              <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Nama Dapur (SPPG)</label>
               <select 
                 name="dapur_name"
                 required
                 value={formData.dapur_name}
                 onChange={handleChange}
                 disabled={!formData.operator_name}
-                className="clay-input w-full p-3 rounded-xl border-none font-bold appearance-none cursor-pointer"
+                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold appearance-none cursor-pointer text-sm sm:text-base min-h-[48px]"
               >
                 <option value="">-- Pilih Dapur --</option>
                 {availableDapurs.map(dapur => (
@@ -219,23 +219,23 @@ export function OperatorForm() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-muted mb-2">Tanggal Distribusi</label>
+              <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Tanggal Distribusi</label>
               <input 
                 type="date" 
                 name="dist_date"
                 required
                 value={formData.dist_date}
                 onChange={handleChange}
-                className="clay-input w-full p-3 rounded-xl border-none font-bold" 
+                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-sm sm:text-base min-h-[48px]" 
               />
             </div>
           </div>
         )}
 
         <div className="clay-card-in p-3 sm:p-5 space-y-3 sm:space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label className="block text-xs sm:text-sm font-bold text-muted mb-1 sm:mb-2">Pagu Belanja (Rp)</label>
+              <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Pagu Belanja (Rp)</label>
               <input 
                 type="text" 
                 name="pagu"
@@ -243,9 +243,9 @@ export function OperatorForm() {
                 value={formData.pagu}
                 onChange={handleCurrencyChange}
                 placeholder="0" 
-                className="clay-input w-full p-2 sm:p-3 rounded-xl border-none font-bold text-base sm:text-lg text-blue-custom" 
+                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-blue-custom min-h-[48px]" 
               />
-              <div className="mt-1 sm:mt-2 text-xs sm:text-sm font-bold">
+              <div className="mt-2 text-xs sm:text-sm font-bold">
                 <span className="text-gray-500">Sisa Pagu: </span>
                 <span className={parseRp(formData.pagu) - parseRp(formData.po_sppg) >= 0 ? "text-green-600" : "text-red-600"}>
                   Rp {formatRp(parseRp(formData.pagu) - parseRp(formData.po_sppg))}
@@ -254,7 +254,7 @@ export function OperatorForm() {
             </div>
             
             <div className="flex flex-col">
-              <label className="block text-xs sm:text-sm font-bold text-muted mb-1 sm:mb-2">PO SPPG (Rp)</label>
+              <label className="block text-xs sm:text-sm font-bold text-muted mb-2">PO SPPG (Rp)</label>
               <input 
                 type="text" 
                 name="po_sppg"
@@ -262,16 +262,16 @@ export function OperatorForm() {
                 value={formData.po_sppg}
                 onChange={handleCurrencyChange}
                 placeholder="0" 
-                className="clay-input w-full p-2 sm:p-3 rounded-xl border-none font-bold text-base sm:text-lg text-blue-custom" 
+                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-blue-custom min-h-[48px]" 
               />
-              <div className="mt-1 sm:mt-2 flex items-center justify-between gap-2 clay-card-in p-2">
-                 <span className="text-[10px] sm:text-xs font-bold text-blue-custom flex items-center gap-1"><FileText className="w-3 h-3"/> <span className="hidden sm:inline">Upload</span></span>
-                 <input type="file" name="file_sppg" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full max-w-[140px] sm:max-w-[180px]" />
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 clay-card-in p-2 sm:p-3">
+                 <span className="text-xs font-bold text-blue-custom flex items-center gap-1.5"><FileText className="w-4 h-4"/> Bukti PO</span>
+                 <input type="file" name="file_sppg" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
               </div>
             </div>
 
             <div className="flex flex-col">
-              <label className="block text-xs sm:text-sm font-bold text-muted mb-1 sm:mb-2">PO Koperasi (Rp)</label>
+              <label className="block text-xs sm:text-sm font-bold text-muted mb-2">PO Koperasi (Rp)</label>
               <input 
                 type="text" 
                 name="po_koperasi"
@@ -279,16 +279,16 @@ export function OperatorForm() {
                 value={formData.po_koperasi}
                 onChange={handleCurrencyChange}
                 placeholder="0" 
-                className="clay-input w-full p-2 sm:p-3 rounded-xl border-none font-bold text-base sm:text-lg text-green-custom" 
+                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-green-custom min-h-[48px]" 
               />
-              <div className="mt-1 sm:mt-2 flex items-center justify-between gap-2 clay-card-in p-2">
-                 <span className="text-[10px] sm:text-xs font-bold text-green-custom flex items-center gap-1"><FileSpreadsheet className="w-3 h-3"/> <span className="hidden sm:inline">Upload</span></span>
-                 <input type="file" name="file_koperasi" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full max-w-[140px] sm:max-w-[180px]" />
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 clay-card-in p-2 sm:p-3">
+                 <span className="text-xs font-bold text-green-custom flex items-center gap-1.5"><FileSpreadsheet className="w-4 h-4"/> Bukti PO</span>
+                 <input type="file" name="file_koperasi" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
               </div>
             </div>
 
             <div className="flex flex-col">
-              <label className="block text-xs sm:text-sm font-bold text-muted mb-1 sm:mb-2">PO Supplier (Rp)</label>
+              <label className="block text-xs sm:text-sm font-bold text-muted mb-2">PO Supplier (Rp)</label>
               <input 
                 type="text" 
                 name="po_supplier"
@@ -296,42 +296,41 @@ export function OperatorForm() {
                 value={formData.po_supplier}
                 onChange={handleCurrencyChange}
                 placeholder="0" 
-                className="clay-input w-full p-2 sm:p-3 rounded-xl border-none font-bold text-base sm:text-lg text-red-500" 
+                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-red-500 min-h-[48px]" 
               />
-              <div className="mt-1 sm:mt-2 flex items-center justify-between gap-2 clay-card-in p-2">
-                 <span className="text-[10px] sm:text-xs font-bold text-red-500 flex items-center gap-1"><FileSpreadsheet className="w-3 h-3"/> <span className="hidden sm:inline">Upload</span></span>
-                 <input type="file" name="file_supplier" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full max-w-[140px] sm:max-w-[180px]" />
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 clay-card-in p-2 sm:p-3">
+                 <span className="text-xs font-bold text-red-500 flex items-center gap-1.5"><FileSpreadsheet className="w-4 h-4"/> Bukti PO</span>
+                 <input type="file" name="file_supplier" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100" />
               </div>
             </div>
           </div>
           
-          <div className="mt-3 sm:mt-4 grid grid-cols-3 gap-2 sm:gap-4">
+          <div className="mt-3 sm:mt-4 grid grid-cols-3 gap-1.5 sm:gap-4">
             <div className="p-2 sm:p-5 clay-card-blue flex flex-col justify-center items-center text-center">
-              <span className="block text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Utama</span>
-              <span className="text-sm sm:text-2xl font-black text-white tracking-tight mb-0.5">
+              <span className="block text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Utama</span>
+              <span className="text-[11px] sm:text-2xl font-black text-white tracking-tight mb-0.5 leading-none">
                 {formatRp(parseRp(formData.po_sppg) - parseRp(formData.po_supplier))}
               </span>
-              <span className="text-[10px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md">
+              <span className="text-[8px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md leading-none mt-0.5">
                 {parseRp(formData.po_sppg) > 0 ? ((parseRp(formData.po_sppg) - parseRp(formData.po_supplier)) / parseRp(formData.po_sppg) * 100).toFixed(1) : 0}%
               </span>
             </div>
-
             <div className="p-2 sm:p-5 clay-card-green flex flex-col justify-center items-center text-center">
-              <span className="block text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Koperasi</span>
-              <span className="text-sm sm:text-2xl font-black text-white tracking-tight mb-0.5">
+              <span className="block text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Koperasi</span>
+              <span className="text-[11px] sm:text-2xl font-black text-white tracking-tight mb-0.5 leading-none">
                 {formatRp(parseRp(formData.po_sppg) - parseRp(formData.po_koperasi))}
               </span>
-              <span className="text-[10px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md">
+              <span className="text-[8px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md leading-none mt-0.5">
                 {parseRp(formData.po_sppg) > 0 ? (((parseRp(formData.po_sppg) - parseRp(formData.po_koperasi)) / parseRp(formData.po_sppg)) * 100).toFixed(1) : 0}%
               </span>
             </div>
             
             <div className="p-2 sm:p-5 clay-card-emerald flex flex-col justify-center items-center text-center">
-              <span className="block text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Yayasan</span>
-              <span className="text-sm sm:text-2xl font-black text-white tracking-tight mb-0.5">
+              <span className="block text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Yayasan</span>
+              <span className="text-[11px] sm:text-2xl font-black text-white tracking-tight mb-0.5 leading-none">
                 {formatRp(parseRp(formData.po_koperasi) - parseRp(formData.po_supplier))}
               </span>
-              <span className="text-[10px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md">
+              <span className="text-[8px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md leading-none mt-0.5">
                 {parseRp(formData.po_sppg) > 0 ? (((parseRp(formData.po_koperasi) - parseRp(formData.po_supplier)) / parseRp(formData.po_sppg)) * 100).toFixed(1) : 0}%
               </span>
             </div>
@@ -341,9 +340,9 @@ export function OperatorForm() {
         <button 
           type="submit" 
           disabled={loading}
-          className="clay-btn blue w-full p-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2"
+          className="clay-btn blue w-full p-4 rounded-xl font-bold text-base sm:text-lg flex items-center justify-center gap-2 mt-6 h-14"
         >
-          {loading ? "Menyimpan Data..." : <><Save className="w-5 h-5" /> SIMPAN DATA</>}
+          {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Menyimpan Data...</> : <><Save className="w-5 h-5" /> SIMPAN DATA</>}
         </button>
       </form>
     </div>

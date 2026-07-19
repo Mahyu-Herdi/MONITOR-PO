@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { OperatorForm } from './components/OperatorForm';
 import { AdminDashboard } from './components/AdminDashboard';
 import { PublicOverview } from './components/PublicOverview';
-import { LogIn, Lock, ArrowLeft } from 'lucide-react';
+import { LogIn, Lock, ArrowLeft, Loader2 } from 'lucide-react';
 import { GAS_URL } from './lib/utils';
 
 type Role = 'GUEST' | 'OPERATOR' | 'ADMIN';
@@ -19,6 +19,7 @@ export default function App() {
   const [adminPassword, setAdminPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleSetRole = (newRole: Role) => {
     setRole(newRole);
@@ -28,6 +29,7 @@ export default function App() {
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
+    setIsLoggingIn(true);
     
     if (!GAS_URL) {
       if (adminPassword === "superadmin123") {
@@ -37,6 +39,7 @@ export default function App() {
       } else {
         setLoginError('Password salah!');
       }
+      setIsLoggingIn(false);
       return;
     }
 
@@ -67,6 +70,8 @@ export default function App() {
       } else {
         setLoginError('Terjadi kesalahan koneksi server.');
       }
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -120,10 +125,12 @@ export default function App() {
                 value={adminPassword}
                 onChange={e => setAdminPassword(e.target.value)}
                 placeholder="Masukkan Password" 
-                className="clay-input w-full p-4 rounded-xl text-center font-bold text-lg"
+                className="clay-input w-full p-4 rounded-xl text-center font-bold text-lg min-h-[56px]"
               />
               {loginError && <p className="text-red-500 font-bold text-sm">{loginError}</p>}
-              <button type="submit" className="clay-btn green w-full p-4 rounded-xl font-bold text-lg">LOGIN ADMIN</button>
+              <button disabled={isLoggingIn} type="submit" className="clay-btn green w-full p-4 rounded-xl font-bold text-lg h-14 flex items-center justify-center gap-2">
+                {isLoggingIn ? <><Loader2 className="w-5 h-5 animate-spin" /> Sedang Login...</> : "LOGIN ADMIN"}
+              </button>
             </form>
           </div>
         )}
