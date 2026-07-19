@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --bg: #e6e2d6; /* Deeper warm beige for better contrast */
+  --txt: #4a4a4a;
+  --muted: #8c8c8c;
+  --blue: #548CA8;
+  --green: #609966;
+  --red: #d96c6c;
+  
+  /* Neumorphism (Soft UI) */
+  --sh-out: 10px 10px 20px #c3bfb5, -10px -10px 20px #ffffff;
+  --sh-out-sm: 5px 5px 10px #c3bfb5, -5px -5px 10px #ffffff;
+  --sh-in: inset 6px 6px 12px #c3bfb5, inset -6px -6px 12px #ffffff;
+  --sh-in-sm: inset 3px 3px 6px #c3bfb5, inset -3px -3px 6px #ffffff;
+  
+  /* Claymorphism (Fluffy 3D) */
+  --clay: var(--sh-out), inset 2px 2px 6px rgba(255, 255, 255, 0.5), inset -2px -2px 6px rgba(0, 0, 0, 0.05);
+  --clay-btn: var(--sh-out-sm), inset 2px 2px 4px rgba(255, 255, 255, 0.3), inset -2px -2px 4px rgba(0, 0, 0, 0.15);
+  --clay-color-in: inset 3px 3px 8px rgba(255, 255, 255, 0.2), inset -3px -3px 8px rgba(0, 0, 0, 0.2);
+}
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer utilities {
+  .clay-card {
+    background: var(--bg);
+    border-radius: 24px;
+    box-shadow: var(--clay);
+  }
+  
+  .clay-card-green {
+    background: var(--green);
+    border-radius: 24px;
+    box-shadow: var(--sh-out), var(--clay-color-in);
+    color: white;
+  }
+  
+  .clay-card-blue {
+    background: var(--blue);
+    border-radius: 24px;
+    box-shadow: var(--sh-out), var(--clay-color-in);
+    color: white;
+  }
+  
+  .clay-card-emerald {
+    background: #059669;
+    border-radius: 24px;
+    box-shadow: var(--sh-out), var(--clay-color-in);
+    color: white;
+  }
+  
+  .clay-card-in {
+    background: var(--bg);
+    border-radius: 20px;
+    box-shadow: var(--sh-in);
+  }
+  
+  .clay-btn {
+    background: var(--bg);
+    color: var(--txt);
+    border-radius: 16px;
+    box-shadow: var(--clay-btn);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .clay-btn:active {
+    box-shadow: var(--sh-in-sm);
+    transform: scale(0.96);
+  }
+  
+  .clay-btn.blue { background: var(--blue); color: white; box-shadow: var(--sh-out-sm), var(--clay-color-in); }
+  .clay-btn.green { background: var(--green); color: white; box-shadow: var(--sh-out-sm), var(--clay-color-in); }
+  .clay-btn.red { background: var(--red); color: white; box-shadow: var(--sh-out-sm), var(--clay-color-in); }
+  
+  .clay-btn.blue:active, .clay-btn.green:active, .clay-btn.red:active {
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.25), inset -2px -2px 6px rgba(255, 255, 255, 0.1);
+  }
+  
+  .clay-input {
+    background: var(--bg);
+    color: var(--txt);
+    border-radius: 16px;
+    box-shadow: var(--sh-in);
+    transition: all 0.3s ease;
+  }
+  
+  .clay-input:focus {
+    outline: none;
+    box-shadow: var(--sh-in), inset 0 0 0 2px rgba(84, 140, 168, 0.4);
+  }
+  
+  .text-blue-custom { color: var(--blue); }
+  .text-green-custom { color: var(--green); }
+  .text-red-custom { color: var(--red); }
+}

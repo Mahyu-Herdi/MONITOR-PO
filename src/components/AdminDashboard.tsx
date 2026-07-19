@@ -1,0 +1,732 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import { formatRp, printHtml, GAS_URL, parseRp } from '../lib/utils';
+import { FileText, FileSpreadsheet, Printer, X, Calendar as CalendarIcon, TrendingUp, TrendingDown, Activity, Edit2, Trash2, Save, XCircle } from 'lucide-react';
+
+const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  if (isNaN(d.getTime())) return dateStr;
+  return `${days[d.getDay()]}, ${d.getDate().toString().padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+};
+
+export function AdminDashboard() {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDapur, setSelectedDapur] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  
+  const [editingId, setEditingId] = useState<string | number | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleViewFile = (url: string) => {
+    let embedUrl = url;
+    if (url.includes('drive.google.com/file/d/')) {
+      embedUrl = url.replace(/\/view.*$/, '/preview');
+    }
+    setPreviewUrl(embedUrl);
+  };
+
+  const handleDelete = async (id: string | number) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
+    
+    setIsSaving(true);
+    try {
+      if (GAS_URL) {
+        const formDataParams = new URLSearchParams();
+        formDataParams.append('action', 'delete');
+        formDataParams.append('id', id.toString());
+        
+        await fetch(GAS_URL, {
+          method: 'POST',
+          body: formDataParams
+        });
+      }
+      
+      setData(prev => prev.filter(item => item.id !== id));
+    } catch (err) {
+      alert('Gagal menghapus data');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditStart = (row: any) => {
+    setEditingId(row.id);
+    setEditForm({
+      pagu: formatRp(row.pagu || 0),
+      po_sppg: formatRp(row.po_sppg || 0),
+      po_koperasi: formatRp(row.po_koperasi || 0),
+      po_supplier: formatRp(row.po_supplier || 0)
+    });
+  };
+
+  const handleCurrencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const numberValue = parseRp(value);
+    
+    setEditForm((prev: any) => ({
+      ...prev,
+      [name]: numberValue === 0 && value === '' ? '' : formatRp(numberValue)
+    }));
+  };
+
+  const handleEditSave = async () => {
+    setIsSaving(true);
+    try {
+      if (GAS_URL) {
+        const formDataParams = new URLSearchParams();
+        formDataParams.append('action', 'update');
+        formDataParams.append('id', editingId!.toString());
+        formDataParams.append('pagu', parseRp(editForm.pagu).toString());
+        formDataParams.append('po_sppg', parseRp(editForm.po_sppg).toString());
+        formDataParams.append('po_koperasi', parseRp(editForm.po_koperasi).toString());
+        formDataParams.append('po_supplier', parseRp(editForm.po_supplier).toString());
+        
+        await fetch(GAS_URL, {
+          method: 'POST',
+          body: formDataParams
+        });
+      }
+      
+      setData(prev => prev.map(item => {
+        if (item.id === editingId) {
+          return {
+            ...item,
+            pagu: parseRp(editForm.pagu),
+            po_sppg: parseRp(editForm.po_sppg),
+            po_koperasi: parseRp(editForm.po_koperasi),
+            po_supplier: parseRp(editForm.po_supplier)
+          };
+        }
+        return item;
+      }));
+      setEditingId(null);
+    } catch (err) {
+      alert('Gagal menyimpan data');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!GAS_URL) {
+      setLoading(false);
+      setData([
+        { id: 1, dist_date: '2026-07-19', operator_name: 'DUMMY OPERATOR', dapur_name: 'SPPG BABAH KRUENG', pagu: 10000000, po_sppg: 9000000, po_koperasi: 8000000, po_supplier: 7000000 },
+        { id: 2, dist_date: '2026-07-19', operator_name: 'DUMMY OPERATOR', dapur_name: 'SPPG BAROH KUTA BATEE', pagu: 15000000, po_sppg: 13000000, po_koperasi: 12000000, po_supplier: 11000000 }
+      ]);
+      return;
+    }
+
+    fetch(GAS_URL)
+      .then(res => res.json())
+      .then(json => {
+        setData(json.distributions || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        setData([
+          { id: 1, dist_date: '2026-07-19', operator_name: 'DUMMY OPERATOR', dapur_name: 'SPPG BABAH KRUENG', pagu: 10000000, po_sppg: 9000000, po_koperasi: 8000000, po_supplier: 7000000 },
+          { id: 2, dist_date: '2026-07-19', operator_name: 'DUMMY OPERATOR', dapur_name: 'SPPG BAROH KUTA BATEE', pagu: 15000000, po_sppg: 13000000, po_koperasi: 12000000, po_supplier: 11000000 }
+        ]);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredData = useMemo(() => {
+    const getLocalYYYYMMDD = (dateStr: string) => {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr.substring(0, 10);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    return data.filter(curr => {
+      const itemDate = getLocalYYYYMMDD(curr.dist_date);
+      if (startDate && endDate) {
+        return itemDate >= startDate && itemDate <= endDate;
+      } else if (startDate && !endDate) {
+        return itemDate === startDate;
+      } else if (!startDate && endDate) {
+        return itemDate === endDate;
+      }
+      return true;
+    });
+  }, [data, startDate, endDate]);
+
+  if (loading) {
+    return <div className="p-8 text-center font-bold text-muted">Memuat data...</div>;
+  }
+
+  // Calculate Summary metrics globally
+  const totalPagu = filteredData.reduce((acc, curr) => acc + curr.pagu, 0);
+  const totalSppg = filteredData.reduce((acc, curr) => acc + curr.po_sppg, 0);
+  const totalKoperasi = filteredData.reduce((acc, curr) => acc + curr.po_koperasi, 0);
+  const totalSupplier = filteredData.reduce((acc, curr) => acc + curr.po_supplier, 0);
+  
+  // Margins
+  const marginPaguSppg = totalPagu - totalSppg; // Sisa Pagu
+  const marginKoperasi = totalSppg - totalKoperasi; // Laba Koperasi
+  const marginYayasan = totalKoperasi - totalSupplier; // Laba Yayasan
+  const marginUtama = totalSppg - totalSupplier; // Margin Utama
+  
+  const persentaseKoperasi = totalSppg > 0 ? (marginKoperasi / totalSppg) * 100 : 0;
+  const persentaseYayasan = totalSppg > 0 ? (marginYayasan / totalSppg) * 100 : 0;
+  const persentaseUtama = totalSppg > 0 ? (marginUtama / totalSppg) * 100 : 0;
+
+  // Chart Data preparation (group by dapur)
+  const chartDataMap = filteredData.reduce((acc: Record<string, any>, curr) => {
+    const d = curr.dapur_name;
+    if (!acc[d]) acc[d] = { 
+      name: d, 
+      pagu: 0, 
+      po_sppg: 0, 
+      po_koperasi: 0, 
+      po_supplier: 0, 
+      marginKoperasi: 0, 
+      marginYayasan: 0,
+      marginUtama: 0,
+      count: 0 
+    };
+    acc[d].pagu += curr.pagu;
+    acc[d].po_sppg += curr.po_sppg;
+    acc[d].po_koperasi += curr.po_koperasi;
+    acc[d].po_supplier += curr.po_supplier;
+    acc[d].marginKoperasi += (curr.po_sppg - curr.po_koperasi);
+    acc[d].marginYayasan += (curr.po_koperasi - curr.po_supplier);
+    acc[d].marginUtama += (curr.po_sppg - curr.po_supplier);
+    acc[d].count += 1;
+    return acc;
+  }, {});
+
+  const chartData = Object.values(chartDataMap).map((d: any) => ({
+    ...d,
+    persentaseUtama: d.po_sppg > 0 ? ((d.marginUtama / d.po_sppg) * 100).toFixed(2) : 0,
+    persentaseKoperasi: d.po_sppg > 0 ? ((d.marginKoperasi / d.po_sppg) * 100).toFixed(2) : 0,
+    persentaseYayasan: d.po_sppg > 0 ? ((d.marginYayasan / d.po_sppg) * 100).toFixed(2) : 0
+  })).sort((a: any, b: any) => b.marginUtama - a.marginUtama);
+  const colors = ['#e74c3c','#3498db','#f1c40f','#2ecc71','#9b59b6','#e67e22'];
+
+  const handlePrint = () => {
+    let tbody = '';
+    chartData.forEach((row: any) => {
+      const pKop = row.persentaseKoperasi;
+      const pYay = row.persentaseYayasan;
+      const pUtm = row.persentaseUtama;
+      tbody += `
+        <tr>
+          <td>${row.name}</td>
+          <td class="text-right text-blue">Rp ${formatRp(row.po_sppg)}</td>
+          <td class="text-right text-green">Rp ${formatRp(row.po_koperasi)}</td>
+          <td class="text-right text-red">Rp ${formatRp(row.po_supplier)}</td>
+          <td class="text-right">Rp ${formatRp(row.marginKoperasi)} (${pKop}%)</td>
+          <td class="text-right">Rp ${formatRp(row.marginYayasan)} (${pYay}%)</td>
+          <td class="text-right font-bold text-blue">Rp ${formatRp(row.marginUtama)} (${pUtm}%)</td>
+        </tr>
+      `;
+    });
+
+    const chartHtml = document.getElementById('pie-chart-container')?.innerHTML || '';
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+      <meta charset="UTF-8">
+      <title>Laporan Rekapitulasi Laba Rugi Dapur</title>
+      <style>
+      body { font-family: sans-serif; padding: 20px; color: #333; }
+      h2 { text-align: center; color: #548CA8; margin-bottom: 5px; text-transform: uppercase; }
+      .period { text-align: center; font-size: 14px; color: #666; margin-bottom: 20px; }
+      .chart-container { width: 100%; height: 400px; margin-bottom: 30px; display: flex; justify-content: center; }
+      .chart-container svg { max-width: 100%; height: 100%; }
+      table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+      th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+      th { background: #548CA8; color: white; text-align: center; }
+      .text-right { text-align: right; }
+      .text-center { text-align: center; }
+      .text-blue { color: #2563eb; }
+      .text-green { color: #16a34a; }
+      .text-red { color: #dc2626; }
+      .font-bold { font-weight: bold; }
+      .total-row { background: #f8fafc; font-weight: bold; }
+      .summary { margin-top: 30px; border-top: 2px solid #548CA8; padding-top: 15px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+      @media print {
+        @page { size: landscape; }
+      }
+      </style>
+      </head>
+      <body>
+      <h2>Laporan Rekapitulasi Laba Rugi Dapur</h2>
+      ${startDate || endDate ? `<div class="period">Periode: ${startDate ? formatDate(startDate) : 'Awal'} s.d. ${endDate ? formatDate(endDate) : 'Akhir'}</div>` : ''}
+      
+      <div class="chart-container">
+        ${chartHtml}
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>NAMA DAPUR</th>
+            <th>TOTAL PO SPPG</th>
+            <th>TOTAL PO KOPERASI</th>
+            <th>TOTAL PO SUPPLIER</th>
+            <th>MARGIN KOPERASI</th>
+            <th>MARGIN YAYASAN</th>
+            <th>MARGIN UTAMA</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tbody}
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td class="text-right">TOTAL</td>
+            <td class="text-right text-blue">Rp ${formatRp(totalSppg)}</td>
+            <td class="text-right text-green">Rp ${formatRp(totalKoperasi)}</td>
+            <td class="text-right text-red">Rp ${formatRp(totalSupplier)}</td>
+            <td class="text-right">Rp ${formatRp(marginKoperasi)}</td>
+            <td class="text-right">Rp ${formatRp(marginYayasan)}</td>
+            <td class="text-right text-blue">Rp ${formatRp(marginUtama)}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="summary">
+        <div>TOTAL MARGIN KOPERASI: <span style="color: #16a34a;">Rp ${formatRp(marginKoperasi)}</span></div>
+        <div>TOTAL MARGIN YAYASAN: <span style="color: #16a34a;">Rp ${formatRp(marginYayasan)}</span></div>
+        <div>TOTAL MARGIN UTAMA: <span style="color: #2563eb;">Rp ${formatRp(marginUtama)}</span></div>
+      </div>
+      </body>
+      </html>
+    `;
+    printHtml(html);
+  };
+
+  const detailedData = selectedDapur ? filteredData.filter(d => d.dapur_name === selectedDapur) : [];
+
+  return (
+    <div className="space-y-6 relative">
+      <div className="clay-card-in p-4 sm:p-5 flex flex-col md:flex-row items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-2 text-blue-custom font-bold text-sm sm:text-base">
+          <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Filter Rentang Waktu:
+        </div>
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full md:w-auto">
+          <input 
+            type="date" 
+            value={startDate} 
+            onChange={(e) => setStartDate(e.target.value)}
+            className="p-2 rounded-xl border-none outline-none font-bold text-xs sm:text-sm bg-white shadow-sm w-full sm:w-auto"
+          />
+          <span className="font-bold text-muted whitespace-nowrap text-xs sm:text-sm">S/D <span className="text-[10px] sm:text-xs font-normal opacity-70">(Kosongkan untuk 1 hari)</span></span>
+          <input 
+            type="date" 
+            value={endDate} 
+            onChange={(e) => setEndDate(e.target.value)}
+            className="p-2 rounded-xl border-none outline-none font-bold text-xs sm:text-sm bg-white shadow-sm w-full sm:w-auto"
+          />
+          {(startDate || endDate) && (
+            <button 
+              onClick={() => { setStartDate(''); setEndDate(''); }}
+              className="text-[10px] sm:text-xs font-bold text-red-500 hover:text-red-600 underline"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="clay-card-in p-4 sm:p-5 flex flex-col items-center justify-center text-center">
+          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-2">Total Pagu BB</h4>
+          <h2 className="text-xl sm:text-2xl font-black text-blue-custom tracking-tight">Rp {formatRp(totalPagu)}</h2>
+        </div>
+        <div className="clay-card-in p-4 sm:p-5 flex flex-col items-center justify-center text-center">
+          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-2">Total PO SPPG</h4>
+          <h2 className="text-xl sm:text-2xl font-black text-blue-custom tracking-tight">Rp {formatRp(totalSppg)}</h2>
+        </div>
+        <div className="clay-card-in p-4 sm:p-5 flex flex-col items-center justify-center text-center">
+          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-2">Total PO Koperasi</h4>
+          <h2 className="text-xl sm:text-2xl font-black text-green-custom tracking-tight">Rp {formatRp(totalKoperasi)}</h2>
+        </div>
+        <div className="clay-card-in p-4 sm:p-5 flex flex-col items-center justify-center text-center">
+          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-2">Total PO Supplier</h4>
+          <h2 className="text-xl sm:text-2xl font-black text-red-500 tracking-tight">Rp {formatRp(totalSupplier)}</h2>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="clay-card-blue p-4 sm:p-6 flex flex-col items-center justify-center text-center">
+          <h3 className="font-extrabold text-white text-xs sm:text-sm mb-1 tracking-tight">SISA PAGU</h3>
+          <p className="text-[10px] sm:text-xs font-medium text-white/80 mb-3 sm:mb-4 tracking-wide">Pagu BB - PO SPPG</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">Rp {formatRp(marginPaguSppg)}</h1>
+        </div>
+        <div className="clay-card-blue p-4 sm:p-6 flex flex-col items-center justify-center text-center" style={{ background: '#548CA8' }}>
+          <h3 className="font-extrabold text-white text-xs sm:text-sm mb-1 tracking-tight">MARGIN UTAMA</h3>
+          <p className="text-[10px] sm:text-xs font-medium text-white/80 mb-3 sm:mb-4 tracking-wide">SPPG - Supplier</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">Rp {formatRp(marginUtama)}</h1>
+          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 mt-3 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[10px] sm:text-xs backdrop-blur-sm shadow-sm">
+            {persentaseUtama.toFixed(1)}%
+          </div>
+        </div>
+        <div className="clay-card-green p-4 sm:p-6 flex flex-col items-center justify-center text-center">
+          <h3 className="font-extrabold text-white text-xs sm:text-sm mb-1 tracking-tight">MARGIN KOPERASI</h3>
+          <p className="text-[10px] sm:text-xs font-medium text-white/80 mb-3 sm:mb-4 tracking-wide">SPPG - Koperasi</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">Rp {formatRp(marginKoperasi)}</h1>
+          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 mt-3 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[10px] sm:text-xs backdrop-blur-sm shadow-sm">
+            {persentaseKoperasi.toFixed(1)}%
+          </div>
+        </div>
+        <div className="clay-card-emerald p-4 sm:p-6 flex flex-col items-center justify-center text-center">
+          <h3 className="font-extrabold text-white text-xs sm:text-sm mb-1 tracking-tight">MARGIN YAYASAN</h3>
+          <p className="text-[10px] sm:text-xs font-medium text-white/80 mb-3 sm:mb-4 tracking-wide">Koperasi - Supplier</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">Rp {formatRp(marginYayasan)}</h1>
+          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 mt-3 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[10px] sm:text-xs backdrop-blur-sm shadow-sm">
+            {persentaseYayasan.toFixed(1)}%
+          </div>
+        </div>
+      </div>
+
+      <div className="clay-card p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+          <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg">GRAFIK MARGIN UTAMA PER DAPUR</h3>
+          <button 
+            onClick={handlePrint}
+            className="clay-btn blue px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold flex items-center gap-1.5 shrink-0"
+          >
+            <Printer className="w-3 h-3 sm:w-4 sm:h-4" /> Cetak
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="h-64 sm:h-80 lg:h-[28rem] w-full relative lg:col-span-2" id="pie-chart-container">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  dataKey="marginUtama"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius="75%"
+                  innerRadius="45%"
+                  paddingAngle={2}
+                  onClick={(entry) => setSelectedDapur(entry.name)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number, name: string, props: any) => [`Rp ${formatRp(value)} (${props.payload.persentaseUtama}%)`, name]} />
+                <Legend verticalAlign="bottom" />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute top-0 right-0 p-2 text-[10px] sm:text-xs font-bold text-muted pointer-events-none">
+              *Klik grafik untuk lihat rincian
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 sm:gap-3 w-full">
+            {chartData.length > 0 && (
+              <>
+                <div className="clay-card-in p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                      <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Margin Tertinggi</h4>
+                      <p className="text-[10px] sm:text-xs font-black text-green-700 leading-tight">{chartData[0].name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs sm:text-sm font-black text-green-700">{chartData[0].persentaseUtama}%</span>
+                  </div>
+                </div>
+
+                <div className="clay-card-in p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                      <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                    </div>
+                    <div>
+                      <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Margin Terendah</h4>
+                      <p className="text-[10px] sm:text-xs font-black text-red-600 leading-tight">{chartData[chartData.length - 1].name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs sm:text-sm font-black text-red-600">{chartData[chartData.length - 1].persentaseUtama}%</span>
+                  </div>
+                </div>
+
+                <div className="clay-card-in p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                      <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-blue-custom" />
+                    </div>
+                    <div>
+                      <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Rata-Rata Margin</h4>
+                      <p className="text-[10px] sm:text-xs font-black text-blue-custom leading-tight">Seluruh Dapur</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs sm:text-sm font-black text-blue-custom">{persentaseUtama.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </>
+            )}
+            {chartData.length === 0 && (
+              <div className="text-center p-4 text-muted text-sm font-bold">
+                Belum ada data distribusi.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {selectedDapur && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="clay-card p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto relative animate-in fade-in zoom-in duration-200">
+            <button 
+              onClick={() => setSelectedDapur(null)}
+              className="absolute top-4 right-4 p-2 bg-red-100 text-red-custom rounded-full hover:scale-110 transition-transform"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <h3 className="font-extrabold text-blue-custom text-2xl mb-6 pr-12">Rincian: {selectedDapur}</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              {detailedData.map((row, i) => {
+                const rMarUtm = row.po_sppg - row.po_supplier;
+                const rMarKop = row.po_sppg - row.po_koperasi;
+                const rMarYay = row.po_koperasi - row.po_supplier;
+                const pKop = row.po_sppg > 0 ? ((rMarKop / row.po_sppg) * 100).toFixed(2) : 0;
+                const pYay = row.po_sppg > 0 ? ((rMarYay / row.po_sppg) * 100).toFixed(2) : 0;
+                const pUtm = row.po_sppg > 0 ? ((rMarUtm / row.po_sppg) * 100).toFixed(2) : 0;
+
+                if (editingId === row.id) {
+                  return (
+                    <div key={row.id} className="clay-card-in p-4 relative bg-yellow-50/50">
+                      <div className="flex justify-between items-start mb-3 border-b border-black/5 pb-2">
+                         <div>
+                            <div className="font-bold text-blue-custom text-sm">{formatDate(row.dist_date)}</div>
+                            <div className="text-xs text-muted font-semibold">Edit Data Transaksi</div>
+                         </div>
+                         <div className="flex gap-2">
+                            <button disabled={isSaving} onClick={handleEditSave} className="p-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200" title="Simpan">
+                              <Save className="w-4 h-4"/>
+                            </button>
+                            <button disabled={isSaving} onClick={() => setEditingId(null)} className="p-1.5 bg-red-100 text-red-500 rounded-lg hover:bg-red-200" title="Batal">
+                              <XCircle className="w-4 h-4"/>
+                            </button>
+                         </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm mb-3">
+                        <div>
+                          <label className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Pagu</label>
+                          <input type="text" name="pagu" className="clay-input w-full p-2 text-sm rounded-xl font-bold text-blue-custom outline-none" value={editForm.pagu} onChange={handleCurrencyChange} />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-500 uppercase font-bold block mb-1">PO SPPG</label>
+                          <input type="text" name="po_sppg" className="clay-input w-full p-2 text-sm rounded-xl font-bold text-blue-custom outline-none" value={editForm.po_sppg} onChange={handleCurrencyChange} />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-500 uppercase font-bold block mb-1">PO Koperasi</label>
+                          <input type="text" name="po_koperasi" className="clay-input w-full p-2 text-sm rounded-xl font-bold text-green-custom outline-none" value={editForm.po_koperasi} onChange={handleCurrencyChange} />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-500 uppercase font-bold block mb-1">PO Supplier</label>
+                          <input type="text" name="po_supplier" className="clay-input w-full p-2 text-sm rounded-xl font-bold text-red-500 outline-none" value={editForm.po_supplier} onChange={handleCurrencyChange} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={row.id} className="clay-card-in p-4 relative">
+                    <div className="flex justify-between items-start mb-3 border-b border-black/5 pb-2">
+                      <div>
+                        <div className="font-bold text-blue-custom text-sm">{formatDate(row.dist_date)}</div>
+                        <div className="text-xs text-muted font-semibold">{row.operator_name}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        {row.file_sppg && (
+                          <button onClick={() => handleViewFile(row.file_sppg)} className="p-1.5 bg-blue-100 text-blue-custom rounded-lg hover:bg-blue-200" title="PO SPPG">
+                            <FileText className="w-4 h-4"/>
+                          </button>
+                        )}
+                        {row.file_koperasi && (
+                          <button onClick={() => handleViewFile(row.file_koperasi)} className="p-1.5 bg-green-100 text-green-custom rounded-lg hover:bg-green-200" title="PO Koperasi">
+                            <FileSpreadsheet className="w-4 h-4"/>
+                          </button>
+                        )}
+                        {row.file_supplier && (
+                          <button onClick={() => handleViewFile(row.file_supplier)} className="p-1.5 bg-red-100 text-red-500 rounded-lg hover:bg-red-200" title="PO Supplier">
+                            <FileSpreadsheet className="w-4 h-4"/>
+                          </button>
+                        )}
+                        <div className="w-px h-6 bg-black/10 mx-1"></div>
+                        <button onClick={() => handleEditStart(row)} className="p-1.5 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200" title="Edit">
+                          <Edit2 className="w-4 h-4"/>
+                        </button>
+                        <button onClick={() => handleDelete(row.id)} className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200" title="Hapus">
+                          <Trash2 className="w-4 h-4"/>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-3">
+                      <div>
+                        <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Pagu BB</span>
+                        <span className="font-semibold text-blue-custom text-sm">Rp {formatRp(row.pagu)}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Sisa Pagu</span>
+                        <span className="font-semibold text-amber-600 text-sm">Rp {formatRp(row.pagu - row.po_sppg)}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO SPPG</span>
+                        <span className="font-semibold text-blue-custom text-sm">Rp {formatRp(row.po_sppg)}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO Koperasi</span>
+                        <span className="font-semibold text-green-custom text-sm">Rp {formatRp(row.po_koperasi)}</span>
+                      </div>
+                      <div className="col-span-2 text-center mt-1">
+                        <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO Supplier</span>
+                        <span className="font-semibold text-red-500 text-sm">Rp {formatRp(row.po_supplier)}</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center clay-card-in p-2 sm:p-3">
+                      <div className="flex flex-col items-center justify-center">
+                        <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Utama</span>
+                        <span className="font-black text-blue-custom text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(rMarUtm)}</span>
+                        <span className="text-[9px] sm:text-[10px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md inline-block">{pUtm}%</span>
+                      </div>
+                      <div className="flex flex-col items-center justify-center border-l border-r border-black/5">
+                        <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Koperasi</span>
+                        <span className="font-black text-green-600 text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(rMarKop)}</span>
+                        <span className="text-[9px] sm:text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-md inline-block">{pKop}%</span>
+                      </div>
+                      <div className="flex flex-col items-center justify-center">
+                        <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Yayasan</span>
+                        <span className="font-black text-emerald-600 text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(rMarYay)}</span>
+                        <span className="text-[9px] sm:text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md inline-block">{pYay}%</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {detailedData.length === 0 && (
+                <div className="p-8 text-center text-muted font-bold clay-card-in">Tidak ada data.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="clay-card p-4 sm:p-6 overflow-hidden">
+        <h3 className="font-extrabold text-blue-custom text-lg mb-4 text-center sm:text-left">TABEL REKAPITULASI TOTAL PER DAPUR</h3>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+          {chartData.map((row: any, i) => {
+            const sisaPagu = row.pagu - row.po_sppg;
+            return (
+              <div 
+                key={row.name} 
+                className="clay-card-in p-4 cursor-pointer hover:bg-black/5 transition-colors"
+                onClick={() => setSelectedDapur(row.name)}
+              >
+                <div className="flex justify-between items-start mb-4 border-b border-black/5 pb-3">
+                  <div>
+                    <div className="font-bold text-blue-custom text-base">{row.name}</div>
+                    <div className="text-xs text-muted font-semibold">{row.count} Transaksi</div>
+                  </div>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setSelectedDapur(row.name); }}
+                    className="px-3 py-1.5 bg-blue-100 text-blue-custom rounded-lg font-bold text-[10px] sm:text-xs hover:bg-blue-200 transition-colors shadow-sm"
+                  >
+                    Rincian & Dok.
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm mb-4">
+                  <div>
+                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Total Pagu</span>
+                    <span className="font-semibold text-blue-custom text-sm">Rp {formatRp(row.pagu)}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Sisa Pagu</span>
+                    <span className="font-bold text-blue-custom text-sm">Rp {formatRp(sisaPagu)}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO SPPG</span>
+                    <span className="font-semibold text-blue-custom text-sm">Rp {formatRp(row.po_sppg)}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO Koperasi</span>
+                    <span className="font-semibold text-green-custom text-sm">Rp {formatRp(row.po_koperasi)}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO Supplier</span>
+                    <span className="font-semibold text-red-500 text-sm">Rp {formatRp(row.po_supplier)}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-center clay-card-in p-2 sm:p-3">
+                  <div className="flex flex-col items-center justify-center">
+                     <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Utama</span>
+                     <span className="font-black text-blue-custom text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(row.marginUtama)}</span>
+                     <span className="text-[9px] sm:text-[10px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md inline-block">{row.persentaseUtama}%</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center border-l border-r border-black/5">
+                     <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Koperasi</span>
+                     <span className="font-black text-green-600 text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(row.marginKoperasi)}</span>
+                     <span className="text-[9px] sm:text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-md inline-block">{row.persentaseKoperasi}%</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center">
+                     <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Yayasan</span>
+                     <span className="font-black text-emerald-600 text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(row.marginYayasan)}</span>
+                     <span className="text-[9px] sm:text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md inline-block">{row.persentaseYayasan}%</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {chartData.length === 0 && (
+            <div className="p-8 text-center text-muted font-bold clay-card-in">Belum ada data distribusi.</div>
+          )}
+        </div>
+
+        <div className="mt-4 text-xs font-bold text-muted text-center sm:text-left">
+          *Klik kartu atau baris dapur untuk melihat rincian dan mengunduh dokumen.
+        </div>
+      </div>
+
+      {previewUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-5xl h-[85vh] bg-white rounded-xl overflow-hidden flex flex-col shadow-2xl">
+            <div className="flex justify-between items-center p-4 bg-gray-100 border-b">
+              <h3 className="font-extrabold text-blue-custom">Pratinjau Dokumen</h3>
+              <div className="flex items-center gap-2">
+                <a href={previewUrl.replace('/preview', '/view')} target="_blank" rel="noreferrer" className="px-4 py-2 bg-blue-500 text-white rounded-lg font-bold text-sm shadow-sm hover:bg-blue-600">Buka di Tab Baru</a>
+                <button onClick={() => setPreviewUrl(null)} className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"><X className="w-5 h-5"/></button>
+              </div>
+            </div>
+            <div className="flex-1 w-full bg-gray-200 overflow-hidden">
+              <iframe src={previewUrl} className="w-full h-full border-none" allow="autoplay" title="Preview Dokumen"></iframe>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

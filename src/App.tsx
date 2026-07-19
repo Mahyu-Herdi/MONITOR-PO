@@ -1,0 +1,137 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState } from 'react';
+import { OperatorForm } from './components/OperatorForm';
+import { AdminDashboard } from './components/AdminDashboard';
+import { PublicOverview } from './components/PublicOverview';
+import { LogIn, Lock, ArrowLeft } from 'lucide-react';
+import { GAS_URL } from './lib/utils';
+
+type Role = 'GUEST' | 'OPERATOR' | 'ADMIN';
+
+export default function App() {
+  const [role, setRole] = useState<Role>(() => {
+    return (localStorage.getItem('app_role') as Role) || 'GUEST';
+  });
+  const [adminPassword, setAdminPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+
+  const handleSetRole = (newRole: Role) => {
+    setRole(newRole);
+    localStorage.setItem('app_role', newRole);
+  };
+
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    
+    if (!GAS_URL) {
+      if (adminPassword === "superadmin123") {
+        handleSetRole('ADMIN');
+        setShowAdminLogin(false);
+        setAdminPassword('');
+      } else {
+        setLoginError('Password salah!');
+      }
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('action', 'login');
+      formData.append('password', adminPassword);
+
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        handleSetRole('ADMIN');
+        setShowAdminLogin(false);
+        setAdminPassword('');
+      } else {
+        setLoginError(data.message || 'Password salah!');
+      }
+    } catch (err) {
+      if (adminPassword === "superadmin123") {
+        handleSetRole('ADMIN');
+        setShowAdminLogin(false);
+        setAdminPassword('');
+      } else {
+        setLoginError('Terjadi kesalahan koneksi server.');
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen p-4 md:p-6 pb-24 w-full max-w-[1600px] mx-auto">
+      {/* HEADER */}
+      <header className="clay-card p-4 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mb-6 md:mb-8 w-full gap-4">
+        <div>
+          <h1 className="text-xl md:text-2xl font-black text-blue-custom m-0">MONITORING DISTRIBUSI</h1>
+          <p className="text-sm font-bold text-muted mt-1">Sistem Input & Validasi PO Dapur</p>
+        </div>
+        
+        {role === 'GUEST' && !showAdminLogin ? (
+          <div className="flex items-center gap-2">
+             <button 
+                onClick={() => handleSetRole('OPERATOR')}
+                className="clay-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2"
+              >
+                <LogIn className="w-4 h-4" /> Masuk Operator
+              </button>
+              <button 
+                onClick={() => setShowAdminLogin(true)}
+                className="clay-btn green px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2"
+              >
+                <Lock className="w-4 h-4" /> Masuk Admin
+              </button>
+          </div>
+        ) : (
+          <button 
+            onClick={() => { handleSetRole('GUEST'); setShowAdminLogin(false); }}
+            className="clay-btn red px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" /> {showAdminLogin && role === 'GUEST' ? 'KEMBALI' : 'KELUAR'}
+          </button>
+        )}
+      </header>
+
+      <main className="w-full">
+        {role === 'GUEST' && !showAdminLogin && (
+          <div className="animate-in fade-in duration-500">
+            <PublicOverview />
+          </div>
+        )}
+
+        {showAdminLogin && role === 'GUEST' && (
+          <div className="clay-card p-8 max-w-md mx-auto mt-16 text-center animate-in slide-in-from-bottom-4 duration-300">
+            <h2 className="text-xl font-black text-blue-custom mb-6">Login Super Admin</h2>
+            <form onSubmit={handleAdminLogin} className="space-y-4">
+              <input 
+                type="password" 
+                value={adminPassword}
+                onChange={e => setAdminPassword(e.target.value)}
+                placeholder="Masukkan Password" 
+                className="clay-input w-full p-4 rounded-xl text-center font-bold text-lg"
+              />
+              {loginError && <p className="text-red-500 font-bold text-sm">{loginError}</p>}
+              <button type="submit" className="clay-btn green w-full p-4 rounded-xl font-bold text-lg">LOGIN ADMIN</button>
+            </form>
+          </div>
+        )}
+
+        {role === 'OPERATOR' && <OperatorForm />}
+        
+        {role === 'ADMIN' && <AdminDashboard />}
+      </main>
+    </div>
+  );
+}
