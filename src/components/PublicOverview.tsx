@@ -1,4 +1,3 @@
-import { CustomSelect } from "./CustomSelect";
 import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 import { formatRp, GAS_URL } from '../lib/utils';
@@ -158,19 +157,25 @@ export function PublicOverview() {
           {showFilter && (
             <div className="flex items-center gap-2 neo-box p-2.5 sm:p-3 min-h-[40px] animate-in fade-in zoom-in duration-200">
               <CalendarIcon className="w-4 h-4 text-blue-custom" />
-              <CustomSelect
+              <select 
                 value={selectedMonth}
-                onChange={(val) => setSelectedMonth(val)}
-                options={months.map(m => ({ value: m.value, label: m.label }))}
-                variant="inline"
-              />
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-blue-custom cursor-pointer appearance-none"
+              >
+                {months.map(m => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
               <span className="text-gray-300">|</span>
-              <CustomSelect
+              <select 
                 value={selectedYear}
-                onChange={(val) => setSelectedYear(val)}
-                options={[currentYear, (Number(currentYear)-1).toString()].map(y => ({ value: y, label: y }))}
-                variant="inline"
-              />
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-blue-custom cursor-pointer appearance-none"
+              >
+                {[currentYear, (Number(currentYear)-1).toString()].map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
             </div>
           )}
         </div>

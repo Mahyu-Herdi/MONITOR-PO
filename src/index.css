@@ -7,24 +7,19 @@
 }
 
 :root {
-  --bg: #F0EBE1; /* Soft cream/off-white */
+  --bg-page: #e8e4d9;
+  --bg: #e8e4d9;
   --txt: #4a4a4a;
   --muted: #8c8c8c;
-  --blue: #5e81ac; /* Soft teal/blue */
-  --green: #8fbc8f; /* Soft green */
-  --red: #bf616a; /* Soft red */
+  --blue: #548CA8;
+  --green: #609966;
+  --red: #d96c6c;
   
-  --shadow-light: #ffffff;
-  --shadow-dark: #d4d0c7;
-
-  /* Claymorphism (Fluffy 3D) */
-  --clay-outset: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light);
-  --clay-outset-sm: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
-  
-  --clay-card: var(--clay-outset), inset 2px 2px 6px rgba(255, 255, 255, 0.6), inset -2px -2px 6px rgba(0, 0, 0, 0.05);
-  --clay-btn: var(--clay-outset-sm), inset 2px 2px 4px rgba(255, 255, 255, 0.5), inset -2px -2px 4px rgba(0, 0, 0, 0.1);
-  --clay-inset: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light), inset 2px 2px 4px rgba(0,0,0,0.02);
-  --clay-inset-sm: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+  --sh-out: 8px 8px 16px #d1cdc0, -8px -8px 16px #fff;
+  --sh-out-sm: 4px 4px 8px #d1cdc0, -4px -4px 8px #fff;
+  --sh-in: inset 6px 6px 12px #d1cdc0, inset -6px -6px 12px #fff;
+  --sh-in-sm: inset 3px 3px 6px #d1cdc0, inset -3px -3px 6px #fff;
+  --clay: 6px 6px 12px #d1cdc0, -6px -6px 12px #fff, inset 2px 2px 5px rgba(255,255,255,.3), inset -3px -3px 5px rgba(0,0,0,.1);
 }
 
 body {
@@ -37,21 +32,21 @@ body {
 @layer utilities {
   .neo-card {
     background: var(--bg);
-    border-radius: 1.5rem; /* rounded-3xl */
-    box-shadow: var(--clay-card);
+    border-radius: 20px;
+    box-shadow: var(--sh-out);
   }
   
   .neo-box {
     background: var(--bg);
-    border-radius: 1rem; /* rounded-2xl */
-    box-shadow: var(--clay-inset);
+    border-radius: 16px;
+    box-shadow: var(--sh-in);
   }
 
   .neo-btn {
     background: var(--bg);
-    color: var(--txt);
-    border-radius: 1rem; /* rounded-2xl */
-    box-shadow: var(--clay-btn);
+    color: var(--blue);
+    border-radius: 14px;
+    box-shadow: var(--sh-out-sm);
     transition: all 0.2s ease-in-out;
     display: inline-flex;
     align-items: center;
@@ -59,8 +54,8 @@ body {
   }
   
   .neo-btn:active:not(:disabled) {
-    box-shadow: var(--clay-inset-sm);
-    transform: scale(0.98);
+    box-shadow: var(--sh-in-sm);
+    transform: scale(0.97);
   }
   
   .neo-btn:disabled {
@@ -76,27 +71,27 @@ body {
   .neo-btn-primary {
     background: var(--blue);
     color: white;
-    border-radius: 1rem;
-    box-shadow: 6px 6px 12px #4c688b, -6px -6px 12px #709acd, inset 2px 2px 4px rgba(255, 255, 255, 0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 14px;
+    box-shadow: var(--clay);
     transition: all 0.2s ease-in-out;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
   .neo-btn-primary:active:not(:disabled) {
-    box-shadow: inset 4px 4px 8px #4c688b, inset -4px -4px 8px #709acd;
-    transform: scale(0.98);
+    box-shadow: var(--sh-in-sm);
+    transform: scale(0.97);
   }
   .neo-btn-primary:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
   }
   
   .neo-input {
     background: var(--bg);
     color: var(--txt);
-    border-radius: 1rem;
-    box-shadow: var(--clay-inset);
+    border-radius: 14px;
+    box-shadow: var(--sh-in);
     transition: all 0.3s ease;
     border: none;
     width: 100%;
@@ -104,7 +99,7 @@ body {
   
   .neo-input:focus {
     outline: none;
-    box-shadow: var(--clay-inset), inset 0 0 0 2px rgba(94, 129, 172, 0.4);
+    box-shadow: var(--sh-in), 0 0 0 3px rgba(84,140,168,.2);
   }
   
   .neo-file-input {
@@ -115,18 +110,18 @@ body {
     background: var(--bg);
     color: var(--blue);
     border: none;
-    border-radius: 1rem;
+    border-radius: 14px;
     padding: 0.5rem 1rem;
     font-weight: 700;
-    box-shadow: var(--clay-btn);
+    box-shadow: var(--sh-out-sm);
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     margin-right: 1rem;
   }
   
   .neo-file-input::file-selector-button:active {
-    box-shadow: var(--clay-inset-sm);
-    transform: scale(0.98);
+    box-shadow: var(--sh-in-sm);
+    transform: scale(0.97);
   }
   
   .text-blue-custom { color: var(--blue); }
