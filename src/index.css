@@ -7,23 +7,24 @@
 }
 
 :root {
-  --bg: #e6e2d6; /* Deeper warm beige for better contrast */
+  --bg: #F0EBE1; /* Soft cream/off-white */
   --txt: #4a4a4a;
   --muted: #8c8c8c;
-  --blue: #548CA8;
-  --green: #609966;
-  --red: #d96c6c;
+  --blue: #5e81ac; /* Soft teal/blue */
+  --green: #8fbc8f; /* Soft green */
+  --red: #bf616a; /* Soft red */
   
-  /* Neumorphism (Soft UI) */
-  --sh-out: 10px 10px 20px #c3bfb5, -10px -10px 20px #ffffff;
-  --sh-out-sm: 5px 5px 10px #c3bfb5, -5px -5px 10px #ffffff;
-  --sh-in: inset 6px 6px 12px #c3bfb5, inset -6px -6px 12px #ffffff;
-  --sh-in-sm: inset 3px 3px 6px #c3bfb5, inset -3px -3px 6px #ffffff;
-  
+  --shadow-light: #ffffff;
+  --shadow-dark: #d4d0c7;
+
   /* Claymorphism (Fluffy 3D) */
-  --clay: var(--sh-out), inset 2px 2px 6px rgba(255, 255, 255, 0.5), inset -2px -2px 6px rgba(0, 0, 0, 0.05);
-  --clay-btn: var(--sh-out-sm), inset 2px 2px 4px rgba(255, 255, 255, 0.3), inset -2px -2px 4px rgba(0, 0, 0, 0.15);
-  --clay-color-in: inset 3px 3px 8px rgba(255, 255, 255, 0.2), inset -3px -3px 8px rgba(0, 0, 0, 0.2);
+  --clay-outset: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light);
+  --clay-outset-sm: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+  
+  --clay-card: var(--clay-outset), inset 2px 2px 6px rgba(255, 255, 255, 0.6), inset -2px -2px 6px rgba(0, 0, 0, 0.05);
+  --clay-btn: var(--clay-outset-sm), inset 2px 2px 4px rgba(255, 255, 255, 0.5), inset -2px -2px 4px rgba(0, 0, 0, 0.1);
+  --clay-inset: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light), inset 2px 2px 4px rgba(0,0,0,0.02);
+  --clay-inset-sm: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
 }
 
 body {
@@ -34,71 +35,98 @@ body {
 }
 
 @layer utilities {
-  .clay-card {
+  .neo-card {
     background: var(--bg);
-    border-radius: 24px;
-    box-shadow: var(--clay);
+    border-radius: 1.5rem; /* rounded-3xl */
+    box-shadow: var(--clay-card);
   }
   
-  .clay-card-green {
-    background: var(--green);
-    border-radius: 24px;
-    box-shadow: var(--sh-out), var(--clay-color-in);
-    color: white;
-  }
-  
-  .clay-card-blue {
-    background: var(--blue);
-    border-radius: 24px;
-    box-shadow: var(--sh-out), var(--clay-color-in);
-    color: white;
-  }
-  
-  .clay-card-emerald {
-    background: #059669;
-    border-radius: 24px;
-    box-shadow: var(--sh-out), var(--clay-color-in);
-    color: white;
-  }
-  
-  .clay-card-in {
+  .neo-box {
     background: var(--bg);
-    border-radius: 20px;
-    box-shadow: var(--sh-in);
+    border-radius: 1rem; /* rounded-2xl */
+    box-shadow: var(--clay-inset);
   }
-  
-  .clay-btn {
+
+  .neo-btn {
     background: var(--bg);
     color: var(--txt);
-    border-radius: 16px;
+    border-radius: 1rem; /* rounded-2xl */
     box-shadow: var(--clay-btn);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   
-  .clay-btn:active {
-    box-shadow: var(--sh-in-sm);
-    transform: scale(0.96);
+  .neo-btn:active:not(:disabled) {
+    box-shadow: var(--clay-inset-sm);
+    transform: scale(0.98);
   }
   
-  .clay-btn.blue { background: var(--blue); color: white; box-shadow: var(--sh-out-sm), var(--clay-color-in); }
-  .clay-btn.green { background: var(--green); color: white; box-shadow: var(--sh-out-sm), var(--clay-color-in); }
-  .clay-btn.red { background: var(--red); color: white; box-shadow: var(--sh-out-sm), var(--clay-color-in); }
+  .neo-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .neo-btn.blue { color: var(--blue); font-weight: 700; }
+  .neo-btn.green { color: var(--green); font-weight: 700; }
+  .neo-btn.red { color: var(--red); font-weight: 700; }
   
-  .clay-btn.blue:active, .clay-btn.green:active, .clay-btn.red:active {
-    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.25), inset -2px -2px 6px rgba(255, 255, 255, 0.1);
+  /* Primary button with color */
+  .neo-btn-primary {
+    background: var(--blue);
+    color: white;
+    border-radius: 1rem;
+    box-shadow: 6px 6px 12px #4c688b, -6px -6px 12px #709acd, inset 2px 2px 4px rgba(255, 255, 255, 0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .neo-btn-primary:active:not(:disabled) {
+    box-shadow: inset 4px 4px 8px #4c688b, inset -4px -4px 8px #709acd;
+    transform: scale(0.98);
+  }
+  .neo-btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
   
-  .clay-input {
+  .neo-input {
     background: var(--bg);
     color: var(--txt);
-    border-radius: 16px;
-    box-shadow: var(--sh-in);
+    border-radius: 1rem;
+    box-shadow: var(--clay-inset);
     transition: all 0.3s ease;
+    border: none;
+    width: 100%;
   }
   
-  .clay-input:focus {
+  .neo-input:focus {
     outline: none;
-    box-shadow: var(--sh-in), inset 0 0 0 2px rgba(84, 140, 168, 0.4);
+    box-shadow: var(--clay-inset), inset 0 0 0 2px rgba(94, 129, 172, 0.4);
+  }
+  
+  .neo-file-input {
+    background: transparent;
+  }
+  
+  .neo-file-input::file-selector-button {
+    background: var(--bg);
+    color: var(--blue);
+    border: none;
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    box-shadow: var(--clay-btn);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin-right: 1rem;
+  }
+  
+  .neo-file-input::file-selector-button:active {
+    box-shadow: var(--clay-inset-sm);
+    transform: scale(0.98);
   }
   
   .text-blue-custom { color: var(--blue); }

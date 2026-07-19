@@ -1,3 +1,4 @@
+import { CustomSelect } from "./CustomSelect";
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Save, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { cn, formatRp, parseRp, GAS_URL } from '../lib/utils';
@@ -168,7 +169,7 @@ export function OperatorForm() {
   };
 
   return (
-    <div className="clay-card p-3 sm:p-6 w-full max-w-5xl mx-auto">
+    <div className="neo-card p-3 sm:p-6 w-full max-w-5xl mx-auto">
       <h2 className="text-sm sm:text-xl font-extrabold text-blue-custom mb-4 flex items-center gap-2">
         <Save className="w-4 h-4 sm:w-6 sm:h-6" />
         Input Distribusi Dapur
@@ -189,34 +190,26 @@ export function OperatorForm() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Nama Operator</label>
-              <select 
+              <CustomSelect
                 name="operator_name"
                 required
                 value={formData.operator_name}
-                onChange={handleChange}
-                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold appearance-none cursor-pointer text-sm sm:text-base min-h-[48px]"
-              >
-                <option value="">-- Pilih Operator --</option>
-                {operators.map(op => (
-                  <option key={op.name} value={op.name}>{op.name}</option>
-                ))}
-              </select>
+                onChange={(val) => setFormData(prev => ({ ...prev, operator_name: val }))}
+                options={operators.map(op => ({ value: op.name, label: op.name }))}
+                placeholder="-- Pilih Operator --"
+              />
             </div>
             <div>
               <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Nama Dapur (SPPG)</label>
-              <select 
+              <CustomSelect
                 name="dapur_name"
                 required
                 value={formData.dapur_name}
-                onChange={handleChange}
+                onChange={(val) => setFormData(prev => ({ ...prev, dapur_name: val }))}
                 disabled={!formData.operator_name}
-                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold appearance-none cursor-pointer text-sm sm:text-base min-h-[48px]"
-              >
-                <option value="">-- Pilih Dapur --</option>
-                {availableDapurs.map(dapur => (
-                  <option key={dapur} value={dapur}>{dapur}</option>
-                ))}
-              </select>
+                options={availableDapurs.map(dapur => ({ value: dapur, label: dapur }))}
+                placeholder="-- Pilih Dapur --"
+              />
             </div>
             <div>
               <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Tanggal Distribusi</label>
@@ -226,13 +219,13 @@ export function OperatorForm() {
                 required
                 value={formData.dist_date}
                 onChange={handleChange}
-                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-sm sm:text-base min-h-[48px]" 
+                className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-sm sm:text-base min-h-[48px]" 
               />
             </div>
           </div>
         )}
 
-        <div className="clay-card-in p-3 sm:p-5 space-y-3 sm:space-y-4">
+        <div className="neo-box p-3 sm:p-5 space-y-3 sm:space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Pagu Belanja (Rp)</label>
@@ -243,7 +236,7 @@ export function OperatorForm() {
                 value={formData.pagu}
                 onChange={handleCurrencyChange}
                 placeholder="0" 
-                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-blue-custom min-h-[48px]" 
+                className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-blue-custom min-h-[48px]" 
               />
               <div className="mt-2 text-xs sm:text-sm font-bold">
                 <span className="text-gray-500">Sisa Pagu: </span>
@@ -262,11 +255,11 @@ export function OperatorForm() {
                 value={formData.po_sppg}
                 onChange={handleCurrencyChange}
                 placeholder="0" 
-                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-blue-custom min-h-[48px]" 
+                className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-blue-custom min-h-[48px]" 
               />
-              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 clay-card-in p-2 sm:p-3">
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 neo-box p-2 sm:p-3">
                  <span className="text-xs font-bold text-blue-custom flex items-center gap-1.5"><FileText className="w-4 h-4"/> Bukti PO</span>
-                 <input type="file" name="file_sppg" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                 <input type="file" name="file_sppg" accept=".pdf,.xls,.xlsx,image/*" required className="neo-file-input text-xs sm:text-sm font-bold text-muted w-full" />
               </div>
             </div>
 
@@ -279,11 +272,11 @@ export function OperatorForm() {
                 value={formData.po_koperasi}
                 onChange={handleCurrencyChange}
                 placeholder="0" 
-                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-green-custom min-h-[48px]" 
+                className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-green-custom min-h-[48px]" 
               />
-              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 clay-card-in p-2 sm:p-3">
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 neo-box p-2 sm:p-3">
                  <span className="text-xs font-bold text-green-custom flex items-center gap-1.5"><FileSpreadsheet className="w-4 h-4"/> Bukti PO</span>
-                 <input type="file" name="file_koperasi" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
+                 <input type="file" name="file_koperasi" accept=".pdf,.xls,.xlsx,image/*" required className="neo-file-input text-xs sm:text-sm font-bold text-muted w-full" />
               </div>
             </div>
 
@@ -296,41 +289,41 @@ export function OperatorForm() {
                 value={formData.po_supplier}
                 onChange={handleCurrencyChange}
                 placeholder="0" 
-                className="clay-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-red-500 min-h-[48px]" 
+                className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-base sm:text-lg text-red-500 min-h-[48px]" 
               />
-              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 clay-card-in p-2 sm:p-3">
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 neo-box p-2 sm:p-3">
                  <span className="text-xs font-bold text-red-500 flex items-center gap-1.5"><FileSpreadsheet className="w-4 h-4"/> Bukti PO</span>
-                 <input type="file" name="file_supplier" accept=".pdf,.xls,.xlsx,image/*" required className="text-[10px] sm:text-xs w-full file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100" />
+                 <input type="file" name="file_supplier" accept=".pdf,.xls,.xlsx,image/*" required className="neo-file-input text-xs sm:text-sm font-bold text-muted w-full" />
               </div>
             </div>
           </div>
           
-          <div className="mt-3 sm:mt-4 grid grid-cols-3 gap-1.5 sm:gap-4">
-            <div className="p-2 sm:p-5 clay-card-blue flex flex-col justify-center items-center text-center">
-              <span className="block text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Utama</span>
-              <span className="text-[11px] sm:text-2xl font-black text-white tracking-tight mb-0.5 leading-none">
+          <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-3 sm:gap-6">
+            <div className="p-4 sm:p-6 neo-box flex flex-col justify-center items-center text-center">
+              <span className="block text-[9px] sm:text-xs font-bold uppercase tracking-wider text-muted mb-1 sm:mb-2">Mar Utama</span>
+              <span className="text-sm sm:text-2xl font-black text-blue-custom tracking-tight mb-1 sm:mb-2 leading-none">
                 {formatRp(parseRp(formData.po_sppg) - parseRp(formData.po_supplier))}
               </span>
-              <span className="text-[8px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md leading-none mt-0.5">
+              <span className="text-[10px] sm:text-sm font-bold text-blue-custom bg-blue-50/50 shadow-sm px-2 py-1 rounded-md leading-none">
                 {parseRp(formData.po_sppg) > 0 ? ((parseRp(formData.po_sppg) - parseRp(formData.po_supplier)) / parseRp(formData.po_sppg) * 100).toFixed(1) : 0}%
               </span>
             </div>
-            <div className="p-2 sm:p-5 clay-card-green flex flex-col justify-center items-center text-center">
-              <span className="block text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Koperasi</span>
-              <span className="text-[11px] sm:text-2xl font-black text-white tracking-tight mb-0.5 leading-none">
+            <div className="p-4 sm:p-6 neo-box flex flex-col justify-center items-center text-center">
+              <span className="block text-[9px] sm:text-xs font-bold uppercase tracking-wider text-muted mb-1 sm:mb-2">Mar Koperasi</span>
+              <span className="text-sm sm:text-2xl font-black text-green-custom tracking-tight mb-1 sm:mb-2 leading-none">
                 {formatRp(parseRp(formData.po_sppg) - parseRp(formData.po_koperasi))}
               </span>
-              <span className="text-[8px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md leading-none mt-0.5">
+              <span className="text-[10px] sm:text-sm font-bold text-green-custom bg-green-50/50 shadow-sm px-2 py-1 rounded-md leading-none">
                 {parseRp(formData.po_sppg) > 0 ? (((parseRp(formData.po_sppg) - parseRp(formData.po_koperasi)) / parseRp(formData.po_sppg)) * 100).toFixed(1) : 0}%
               </span>
             </div>
             
-            <div className="p-2 sm:p-5 clay-card-emerald flex flex-col justify-center items-center text-center">
-              <span className="block text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/80 mb-0.5 sm:mb-1">Mar Yayasan</span>
-              <span className="text-[11px] sm:text-2xl font-black text-white tracking-tight mb-0.5 leading-none">
+            <div className="p-4 sm:p-6 neo-box flex flex-col justify-center items-center text-center">
+              <span className="block text-[9px] sm:text-xs font-bold uppercase tracking-wider text-muted mb-1 sm:mb-2">Mar Yayasan</span>
+              <span className="text-sm sm:text-2xl font-black text-emerald-600 tracking-tight mb-1 sm:mb-2 leading-none">
                 {formatRp(parseRp(formData.po_koperasi) - parseRp(formData.po_supplier))}
               </span>
-              <span className="text-[8px] sm:text-sm font-bold text-white bg-white/20 shadow-sm px-1.5 py-0.5 rounded-md leading-none mt-0.5">
+              <span className="text-[10px] sm:text-sm font-bold text-emerald-600 bg-emerald-50/50 shadow-sm px-2 py-1 rounded-md leading-none">
                 {parseRp(formData.po_sppg) > 0 ? (((parseRp(formData.po_koperasi) - parseRp(formData.po_supplier)) / parseRp(formData.po_sppg)) * 100).toFixed(1) : 0}%
               </span>
             </div>
@@ -340,7 +333,7 @@ export function OperatorForm() {
         <button 
           type="submit" 
           disabled={loading}
-          className="clay-btn blue w-full p-4 rounded-xl font-bold text-base sm:text-lg flex items-center justify-center gap-2 mt-6 h-14"
+          className="neo-btn-primary w-full p-4 rounded-xl font-bold text-base sm:text-lg flex items-center justify-center gap-2 mt-6 h-14"
         >
           {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Menyimpan Data...</> : <><Save className="w-5 h-5" /> SIMPAN DATA</>}
         </button>

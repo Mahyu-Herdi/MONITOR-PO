@@ -78,35 +78,39 @@ export default function App() {
   return (
     <div className="min-h-screen p-4 md:p-6 pb-24 w-full max-w-[1600px] mx-auto">
       {/* HEADER */}
-      <header className="clay-card p-4 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mb-6 md:mb-8 w-full gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-blue-custom m-0">MONITORING DISTRIBUSI</h1>
-          <p className="text-sm font-bold text-muted mt-1">Sistem Input & Validasi PO Dapur</p>
+      <header className="neo-card p-4 md:p-6 mb-6 md:mb-8 w-full relative flex flex-col lg:flex-row items-center justify-center gap-4">
+        <div className="hidden lg:block lg:flex-1"></div>
+        
+        <div className="text-center z-10">
+          <h1 className="text-xl md:text-2xl font-black text-blue-custom m-0 tracking-tight">MONITORING DISTRIBUSI</h1>
+          <p className="text-xs md:text-sm font-bold text-muted mt-1">Sistem Input & Validasi PO Dapur</p>
         </div>
         
-        {role === 'GUEST' && !showAdminLogin ? (
-          <div className="flex items-center gap-2">
-             <button 
-                onClick={() => handleSetRole('OPERATOR')}
-                className="clay-btn blue px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2"
-              >
-                <LogIn className="w-4 h-4" /> Masuk Operator
-              </button>
-              <button 
-                onClick={() => setShowAdminLogin(true)}
-                className="clay-btn green px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2"
-              >
-                <Lock className="w-4 h-4" /> Masuk Admin
-              </button>
-          </div>
-        ) : (
-          <button 
-            onClick={() => { handleSetRole('GUEST'); setShowAdminLogin(false); }}
-            className="clay-btn red px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" /> {showAdminLogin && role === 'GUEST' ? 'KEMBALI' : 'KELUAR'}
-          </button>
-        )}
+        <div className="flex-1 flex flex-row justify-center lg:justify-end items-center gap-4 z-10 w-full lg:w-auto">
+          {role === 'GUEST' && !showAdminLogin ? (
+            <>
+               <button 
+                  onClick={() => handleSetRole('OPERATOR')}
+                  className="neo-btn blue px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2"
+                >
+                  <LogIn className="w-4 h-4" /> Masuk Operator
+                </button>
+                <button 
+                  onClick={() => setShowAdminLogin(true)}
+                  className="neo-btn green px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2"
+                >
+                  <Lock className="w-4 h-4" /> Masuk Admin
+                </button>
+            </>
+          ) : (
+            <button 
+              onClick={() => { handleSetRole('GUEST'); setShowAdminLogin(false); }}
+              className="neo-btn red px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" /> {showAdminLogin && role === 'GUEST' ? 'KEMBALI' : 'KELUAR'}
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="w-full">
@@ -117,7 +121,7 @@ export default function App() {
         )}
 
         {showAdminLogin && role === 'GUEST' && (
-          <div className="clay-card p-8 max-w-md mx-auto mt-16 text-center animate-in slide-in-from-bottom-4 duration-300">
+          <div className="neo-card p-8 max-w-md mx-auto mt-16 text-center animate-in slide-in-from-bottom-4 duration-300">
             <h2 className="text-xl font-black text-blue-custom mb-6">Login Super Admin</h2>
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <input 
@@ -125,10 +129,10 @@ export default function App() {
                 value={adminPassword}
                 onChange={e => setAdminPassword(e.target.value)}
                 placeholder="Masukkan Password" 
-                className="clay-input w-full p-4 rounded-xl text-center font-bold text-lg min-h-[56px]"
+                className="neo-input w-full p-4 rounded-xl text-center font-bold text-lg min-h-[56px]"
               />
               {loginError && <p className="text-red-500 font-bold text-sm">{loginError}</p>}
-              <button disabled={isLoggingIn} type="submit" className="clay-btn green w-full p-4 rounded-xl font-bold text-lg h-14 flex items-center justify-center gap-2">
+              <button disabled={isLoggingIn} type="submit" className="neo-btn green w-full p-4 rounded-xl font-bold text-lg h-14 flex items-center justify-center gap-2">
                 {isLoggingIn ? <><Loader2 className="w-5 h-5 animate-spin" /> Sedang Login...</> : "LOGIN ADMIN"}
               </button>
             </form>

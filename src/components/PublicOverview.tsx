@@ -1,3 +1,4 @@
+import { CustomSelect } from "./CustomSelect";
 import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 import { formatRp, GAS_URL } from '../lib/utils';
@@ -141,13 +142,13 @@ export function PublicOverview() {
       <div className="flex justify-end">
         <button 
           onClick={() => setShowFilter(!showFilter)} 
-          className="clay-btn blue px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold"
+          className="neo-btn blue px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold"
         >
           {showFilter ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
         </button>
       </div>
 
-      <div className="clay-card p-4 sm:p-6">
+      <div className="neo-card p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
           <div className="text-center sm:text-left">
             <h2 className="text-lg sm:text-xl font-black text-blue-custom tracking-tight">Performa Margin Dapur</h2>
@@ -155,27 +156,21 @@ export function PublicOverview() {
           </div>
           
           {showFilter && (
-            <div className="flex items-center gap-2 clay-card-in p-2.5 sm:p-3 min-h-[40px] animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-2 neo-box p-2.5 sm:p-3 min-h-[40px] animate-in fade-in zoom-in duration-200">
               <CalendarIcon className="w-4 h-4 text-blue-custom" />
-              <select 
+              <CustomSelect
                 value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-blue-custom cursor-pointer"
-              >
-                {months.map(m => (
-                  <option key={m.value} value={m.value}>{m.label}</option>
-                ))}
-              </select>
+                onChange={(val) => setSelectedMonth(val)}
+                options={months.map(m => ({ value: m.value, label: m.label }))}
+                variant="inline"
+              />
               <span className="text-gray-300">|</span>
-              <select 
+              <CustomSelect
                 value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-blue-custom cursor-pointer"
-              >
-                {[currentYear, (Number(currentYear)-1).toString()].map(y => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
+                onChange={(val) => setSelectedYear(val)}
+                options={[currentYear, (Number(currentYear)-1).toString()].map(y => ({ value: y, label: y }))}
+                variant="inline"
+              />
             </div>
           )}
         </div>
@@ -206,7 +201,7 @@ export function PublicOverview() {
                     formatter={(value: number, name: string) => [`${value}%`, name]}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '8px 8px 16px #d1d5db, -8px -8px 16px #ffffff', fontWeight: 'bold' }}
                   />
-                  <Legend verticalAlign="bottom" />
+                  <Legend verticalAlign="bottom" align="center" />
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute top-0 right-0 p-2 text-[10px] font-bold text-muted pointer-events-none">
@@ -215,7 +210,7 @@ export function PublicOverview() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <div className="clay-card-in p-3 flex items-center justify-between gap-3">
+              <div className="neo-box p-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 shadow-inner">
                     <TrendingUp className="w-4 h-4 text-green-600" />
@@ -230,7 +225,7 @@ export function PublicOverview() {
                 </div>
               </div>
 
-              <div className="clay-card-in p-3 flex items-center justify-between gap-3">
+              <div className="neo-box p-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 shadow-inner">
                     <TrendingDown className="w-4 h-4 text-red-500" />
@@ -245,7 +240,7 @@ export function PublicOverview() {
                 </div>
               </div>
 
-              <div className="clay-card-in p-3 flex items-center justify-between gap-3">
+              <div className="neo-box p-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 shadow-inner">
                     <Activity className="w-4 h-4 text-blue-custom" />
@@ -271,14 +266,14 @@ export function PublicOverview() {
             </div>
           </div>
         ) : (
-          <div className="p-8 text-center text-muted font-bold clay-card-in">
+          <div className="p-8 text-center text-muted font-bold neo-box">
             Belum ada data untuk bulan {months.find(m => m.value === selectedMonth)?.label} {selectedYear}.
           </div>
         )}
       </div>
 
       {selectedDapurData && (
-        <div className="clay-card p-3 sm:p-6 animate-in slide-in-from-bottom-4 fade-in duration-300">
+        <div className="neo-card p-3 sm:p-6 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg">Rincian: {selectedDapurData.name}</h3>
             <button 
@@ -290,39 +285,39 @@ export function PublicOverview() {
           </div>
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-4 mb-3">
-            <div className="clay-card-in p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
+            <div className="neo-box p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
               <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total Pagu</span>
               <span className="font-black text-blue-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.pagu)}</span>
             </div>
-            <div className="clay-card-in p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
+            <div className="neo-box p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
               <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO SPPG</span>
               <span className="font-black text-blue-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_sppg)}</span>
             </div>
-            <div className="clay-card-in p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
+            <div className="neo-box p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
               <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO Koperasi</span>
               <span className="font-black text-green-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_koperasi)}</span>
             </div>
-            <div className="clay-card-in p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
+            <div className="neo-box p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
               <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO Supplier</span>
               <span className="font-black text-red-500 text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_supplier)}</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-1.5 sm:gap-4 text-center">
-            <div className="clay-card-blue p-2 flex flex-col items-center justify-center min-h-[60px] sm:min-h-0">
-              <span className="text-[7px] sm:text-[10px] text-white/80 uppercase font-bold block mb-0.5 leading-none">Margin Utama</span>
-              <span className="font-black text-white text-[11px] sm:text-lg mb-1 leading-none mt-1">Rp {formatRp(selectedDapurData.marginUtama)}</span>
-              <span className="text-[7px] sm:text-[10px] font-bold bg-white/20 text-white px-1.5 py-0.5 rounded-full leading-none">{selectedDapurData.persentaseUtama}%</span>
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center mt-4">
+            <div className="neo-box p-3 sm:p-4 flex flex-col items-center justify-center">
+              <span className="text-[9px] sm:text-[10px] text-muted uppercase font-bold block mb-1 leading-none">Margin Utama</span>
+              <span className="font-black text-blue-custom text-[11px] sm:text-lg mb-2 leading-none mt-1">Rp {formatRp(selectedDapurData.marginUtama)}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold bg-blue-50/50 text-blue-custom px-2 py-1 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseUtama}%</span>
             </div>
-            <div className="clay-card-green p-2 flex flex-col items-center justify-center min-h-[60px] sm:min-h-0">
-              <span className="text-[7px] sm:text-[10px] text-white/80 uppercase font-bold block mb-0.5 leading-none">Margin Koperasi</span>
-              <span className="font-black text-white text-[11px] sm:text-lg mb-1 leading-none mt-1">Rp {formatRp(selectedDapurData.marginKoperasi)}</span>
-              <span className="text-[7px] sm:text-[10px] font-bold bg-white/20 text-white px-1.5 py-0.5 rounded-full leading-none">{selectedDapurData.persentaseKoperasi}%</span>
+            <div className="neo-box p-3 sm:p-4 flex flex-col items-center justify-center">
+              <span className="text-[9px] sm:text-[10px] text-muted uppercase font-bold block mb-1 leading-none">Margin Koperasi</span>
+              <span className="font-black text-green-custom text-[11px] sm:text-lg mb-2 leading-none mt-1">Rp {formatRp(selectedDapurData.marginKoperasi)}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold bg-green-50/50 text-green-custom px-2 py-1 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseKoperasi}%</span>
             </div>
-            <div className="clay-card-emerald p-2 flex flex-col items-center justify-center min-h-[60px] sm:min-h-0">
-              <span className="text-[7px] sm:text-[10px] text-white/80 uppercase font-bold block mb-0.5 leading-none">Margin Yayasan</span>
-              <span className="font-black text-white text-[11px] sm:text-lg mb-1 leading-none mt-1">Rp {formatRp(selectedDapurData.marginYayasan)}</span>
-              <span className="text-[7px] sm:text-[10px] font-bold bg-white/20 text-white px-1.5 py-0.5 rounded-full leading-none">{selectedDapurData.persentaseYayasan}%</span>
+            <div className="neo-box p-3 sm:p-4 flex flex-col items-center justify-center">
+              <span className="text-[9px] sm:text-[10px] text-muted uppercase font-bold block mb-1 leading-none">Margin Yayasan</span>
+              <span className="font-black text-emerald-600 text-[11px] sm:text-lg mb-2 leading-none mt-1">Rp {formatRp(selectedDapurData.marginYayasan)}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold bg-emerald-50/50 text-emerald-600 px-2 py-1 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseYayasan}%</span>
             </div>
           </div>
         </div>
