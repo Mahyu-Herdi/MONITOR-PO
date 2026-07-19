@@ -83,7 +83,7 @@ export default function App() {
           <div className="flex items-center gap-2">
              <button 
                 onClick={() => handleSetRole('OPERATOR')}
-                className="clay-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2"
+                className="clay-btn blue px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2"
               >
                 <LogIn className="w-4 h-4" /> Masuk Operator
               </button>

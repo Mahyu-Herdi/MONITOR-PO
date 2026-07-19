@@ -26,6 +26,7 @@ const months = [
 export function PublicOverview() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showFilter, setShowFilter] = useState(true);
   
   const currentMonth = new Date().toISOString().slice(5, 7);
   const currentYear = new Date().getFullYear().toString();
@@ -137,6 +138,15 @@ export function PublicOverview() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <button 
+          onClick={() => setShowFilter(!showFilter)} 
+          className="clay-btn blue px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold"
+        >
+          {showFilter ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+        </button>
+      </div>
+
       <div className="clay-card p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
           <div className="text-center sm:text-left">
@@ -144,28 +154,30 @@ export function PublicOverview() {
             <p className="text-xs font-bold text-muted mt-1">Gambaran margin utama persentase</p>
           </div>
           
-          <div className="flex items-center gap-2 clay-card-in p-2">
-            <CalendarIcon className="w-4 h-4 text-blue-custom" />
-            <select 
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-blue-custom cursor-pointer"
-            >
-              {months.map(m => (
-                <option key={m.value} value={m.value}>{m.label}</option>
-              ))}
-            </select>
-            <span className="text-gray-300">|</span>
-            <select 
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-blue-custom cursor-pointer"
-            >
-              {[currentYear, (Number(currentYear)-1).toString()].map(y => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-          </div>
+          {showFilter && (
+            <div className="flex items-center gap-2 clay-card-in p-2 animate-in fade-in zoom-in duration-200">
+              <CalendarIcon className="w-4 h-4 text-blue-custom" />
+              <select 
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-blue-custom cursor-pointer"
+              >
+                {months.map(m => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+              <span className="text-gray-300">|</span>
+              <select 
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-blue-custom cursor-pointer"
+              >
+                {[currentYear, (Number(currentYear)-1).toString()].map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {chartData.length > 0 ? (
@@ -277,7 +289,7 @@ export function PublicOverview() {
             </button>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
             <div className="clay-card-in p-3">
               <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total Pagu</span>
               <span className="font-black text-blue-custom text-sm">Rp {formatRp(selectedDapurData.pagu)}</span>
@@ -296,7 +308,7 @@ export function PublicOverview() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-center">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
             <div className="clay-card-blue p-3 flex flex-col items-center justify-center">
               <span className="text-[9px] sm:text-[10px] text-white/80 uppercase font-bold block mb-1">Margin Utama</span>
               <span className="font-black text-white text-sm sm:text-lg mb-1">Rp {formatRp(selectedDapurData.marginUtama)}</span>

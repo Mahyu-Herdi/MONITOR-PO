@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
-import { formatRp, printHtml, GAS_URL, parseRp } from '../lib/utils';
-import { FileText, FileSpreadsheet, Printer, X, Calendar as CalendarIcon, TrendingUp, TrendingDown, Activity, Edit2, Trash2, Save, XCircle } from 'lucide-react';
+import { formatRp, GAS_URL, parseRp } from '../lib/utils';
+import { FileText, FileSpreadsheet, X, Calendar as CalendarIcon, TrendingUp, TrendingDown, Activity, Edit2, Trash2, Save, XCircle } from 'lucide-react';
 
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
@@ -23,6 +23,7 @@ export function AdminDashboard() {
   const [editingId, setEditingId] = useState<string | number | null>(null);
   const [editForm, setEditForm] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [showFilter, setShowFilter] = useState(true);
 
   const handleViewFile = (url: string) => {
     let embedUrl = url;
@@ -215,180 +216,96 @@ export function AdminDashboard() {
   })).sort((a: any, b: any) => b.marginUtama - a.marginUtama);
   const colors = ['#e74c3c','#3498db','#f1c40f','#2ecc71','#9b59b6','#e67e22'];
 
-  const handlePrint = () => {
-    let tbody = '';
-    chartData.forEach((row: any) => {
-      const pKop = row.persentaseKoperasi;
-      const pYay = row.persentaseYayasan;
-      const pUtm = row.persentaseUtama;
-      tbody += `
-        <tr>
-          <td>${row.name}</td>
-          <td class="text-right text-blue">Rp ${formatRp(row.po_sppg)}</td>
-          <td class="text-right text-green">Rp ${formatRp(row.po_koperasi)}</td>
-          <td class="text-right text-red">Rp ${formatRp(row.po_supplier)}</td>
-          <td class="text-right">Rp ${formatRp(row.marginKoperasi)} (${pKop}%)</td>
-          <td class="text-right">Rp ${formatRp(row.marginYayasan)} (${pYay}%)</td>
-          <td class="text-right font-bold text-blue">Rp ${formatRp(row.marginUtama)} (${pUtm}%)</td>
-        </tr>
-      `;
-    });
-
-    const chartHtml = document.getElementById('pie-chart-container')?.innerHTML || '';
-
-    const html = `
-      <!DOCTYPE html>
-      <html lang="id">
-      <head>
-      <meta charset="UTF-8">
-      <title>Laporan Rekapitulasi Laba Rugi Dapur</title>
-      <style>
-      body { font-family: sans-serif; padding: 20px; color: #333; }
-      h2 { text-align: center; color: #548CA8; margin-bottom: 5px; text-transform: uppercase; }
-      .period { text-align: center; font-size: 14px; color: #666; margin-bottom: 20px; }
-      .chart-container { width: 100%; height: 400px; margin-bottom: 30px; display: flex; justify-content: center; }
-      .chart-container svg { max-width: 100%; height: 100%; }
-      table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-      th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-      th { background: #548CA8; color: white; text-align: center; }
-      .text-right { text-align: right; }
-      .text-center { text-align: center; }
-      .text-blue { color: #2563eb; }
-      .text-green { color: #16a34a; }
-      .text-red { color: #dc2626; }
-      .font-bold { font-weight: bold; }
-      .total-row { background: #f8fafc; font-weight: bold; }
-      .summary { margin-top: 30px; border-top: 2px solid #548CA8; padding-top: 15px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-      @media print {
-        @page { size: landscape; }
-      }
-      </style>
-      </head>
-      <body>
-      <h2>Laporan Rekapitulasi Laba Rugi Dapur</h2>
-      ${startDate || endDate ? `<div class="period">Periode: ${startDate ? formatDate(startDate) : 'Awal'} s.d. ${endDate ? formatDate(endDate) : 'Akhir'}</div>` : ''}
-      
-      <div class="chart-container">
-        ${chartHtml}
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>NAMA DAPUR</th>
-            <th>TOTAL PO SPPG</th>
-            <th>TOTAL PO KOPERASI</th>
-            <th>TOTAL PO SUPPLIER</th>
-            <th>MARGIN KOPERASI</th>
-            <th>MARGIN YAYASAN</th>
-            <th>MARGIN UTAMA</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tbody}
-        </tbody>
-        <tfoot>
-          <tr class="total-row">
-            <td class="text-right">TOTAL</td>
-            <td class="text-right text-blue">Rp ${formatRp(totalSppg)}</td>
-            <td class="text-right text-green">Rp ${formatRp(totalKoperasi)}</td>
-            <td class="text-right text-red">Rp ${formatRp(totalSupplier)}</td>
-            <td class="text-right">Rp ${formatRp(marginKoperasi)}</td>
-            <td class="text-right">Rp ${formatRp(marginYayasan)}</td>
-            <td class="text-right text-blue">Rp ${formatRp(marginUtama)}</td>
-          </tr>
-        </tfoot>
-      </table>
-      <div class="summary">
-        <div>TOTAL MARGIN KOPERASI: <span style="color: #16a34a;">Rp ${formatRp(marginKoperasi)}</span></div>
-        <div>TOTAL MARGIN YAYASAN: <span style="color: #16a34a;">Rp ${formatRp(marginYayasan)}</span></div>
-        <div>TOTAL MARGIN UTAMA: <span style="color: #2563eb;">Rp ${formatRp(marginUtama)}</span></div>
-      </div>
-      </body>
-      </html>
-    `;
-    printHtml(html);
-  };
-
   const detailedData = selectedDapur ? filteredData.filter(d => d.dapur_name === selectedDapur) : [];
 
   return (
     <div className="space-y-6 relative">
-      <div className="clay-card-in p-4 sm:p-5 flex flex-col md:flex-row items-center gap-3 sm:gap-4">
-        <div className="flex items-center gap-2 text-blue-custom font-bold text-sm sm:text-base">
-          <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Filter Rentang Waktu:
+      <div className="flex justify-end">
+        <button 
+          onClick={() => setShowFilter(!showFilter)} 
+          className="clay-btn blue px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold"
+        >
+          {showFilter ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+        </button>
+      </div>
+
+      {showFilter && (
+        <div className="clay-card-in p-4 sm:p-5 flex flex-col md:flex-row items-center gap-3 sm:gap-4 animate-in fade-in zoom-in duration-200">
+          <div className="flex items-center gap-2 text-blue-custom font-bold text-sm sm:text-base">
+            <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Filter Rentang Waktu:
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full md:w-auto">
+            <input 
+              type="date" 
+              value={startDate} 
+              onChange={(e) => setStartDate(e.target.value)}
+              className="p-2 rounded-xl border-none outline-none font-bold text-xs sm:text-sm bg-white shadow-sm w-full sm:w-auto"
+            />
+            <span className="font-bold text-muted whitespace-nowrap text-xs sm:text-sm">S/D <span className="text-[10px] sm:text-xs font-normal opacity-70">(Kosongkan untuk 1 hari)</span></span>
+            <input 
+              type="date" 
+              value={endDate} 
+              onChange={(e) => setEndDate(e.target.value)}
+              className="p-2 rounded-xl border-none outline-none font-bold text-xs sm:text-sm bg-white shadow-sm w-full sm:w-auto"
+            />
+            {(startDate || endDate) && (
+              <button 
+                onClick={() => { setStartDate(''); setEndDate(''); }}
+                className="text-[10px] sm:text-xs font-bold text-red-500 hover:text-red-600 underline"
+              >
+                Reset
+              </button>
+            )}
+          </div>
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full md:w-auto">
-          <input 
-            type="date" 
-            value={startDate} 
-            onChange={(e) => setStartDate(e.target.value)}
-            className="p-2 rounded-xl border-none outline-none font-bold text-xs sm:text-sm bg-white shadow-sm w-full sm:w-auto"
-          />
-          <span className="font-bold text-muted whitespace-nowrap text-xs sm:text-sm">S/D <span className="text-[10px] sm:text-xs font-normal opacity-70">(Kosongkan untuk 1 hari)</span></span>
-          <input 
-            type="date" 
-            value={endDate} 
-            onChange={(e) => setEndDate(e.target.value)}
-            className="p-2 rounded-xl border-none outline-none font-bold text-xs sm:text-sm bg-white shadow-sm w-full sm:w-auto"
-          />
-          {(startDate || endDate) && (
-            <button 
-              onClick={() => { setStartDate(''); setEndDate(''); }}
-              className="text-[10px] sm:text-xs font-bold text-red-500 hover:text-red-600 underline"
-            >
-              Reset
-            </button>
-          )}
+      )}
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
+        <div className="clay-card-in p-3 sm:p-5 flex flex-col items-center justify-center text-center">
+          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-1 sm:mb-2 leading-tight">Total Pagu BB</h4>
+          <h2 className="text-sm sm:text-2xl font-black text-blue-custom tracking-tight leading-none">Rp {formatRp(totalPagu)}</h2>
+        </div>
+        <div className="clay-card-in p-3 sm:p-5 flex flex-col items-center justify-center text-center">
+          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-1 sm:mb-2 leading-tight">Total PO SPPG</h4>
+          <h2 className="text-sm sm:text-2xl font-black text-blue-custom tracking-tight leading-none">Rp {formatRp(totalSppg)}</h2>
+        </div>
+        <div className="clay-card-in p-3 sm:p-5 flex flex-col items-center justify-center text-center">
+          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-1 sm:mb-2 leading-tight">Total PO Koperasi</h4>
+          <h2 className="text-sm sm:text-2xl font-black text-green-custom tracking-tight leading-none">Rp {formatRp(totalKoperasi)}</h2>
+        </div>
+        <div className="clay-card-in p-3 sm:p-5 flex flex-col items-center justify-center text-center">
+          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-1 sm:mb-2 leading-tight">Total PO Supplier</h4>
+          <h2 className="text-sm sm:text-2xl font-black text-red-500 tracking-tight leading-none">Rp {formatRp(totalSupplier)}</h2>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div className="clay-card-in p-4 sm:p-5 flex flex-col items-center justify-center text-center">
-          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-2">Total Pagu BB</h4>
-          <h2 className="text-xl sm:text-2xl font-black text-blue-custom tracking-tight">Rp {formatRp(totalPagu)}</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
+        <div className="clay-card-blue p-3 sm:p-6 flex flex-col items-center justify-center text-center">
+          <h3 className="font-extrabold text-white text-[11px] sm:text-sm mb-0.5 sm:mb-1 tracking-tight leading-tight">SISA PAGU</h3>
+          <p className="text-[9px] sm:text-xs font-medium text-white/80 mb-2 sm:mb-4 tracking-wide leading-none">Pagu BB - PO SPPG</p>
+          <h1 className="text-lg sm:text-3xl font-black text-white tracking-tighter leading-none">Rp {formatRp(marginPaguSppg)}</h1>
         </div>
-        <div className="clay-card-in p-4 sm:p-5 flex flex-col items-center justify-center text-center">
-          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-2">Total PO SPPG</h4>
-          <h2 className="text-xl sm:text-2xl font-black text-blue-custom tracking-tight">Rp {formatRp(totalSppg)}</h2>
-        </div>
-        <div className="clay-card-in p-4 sm:p-5 flex flex-col items-center justify-center text-center">
-          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-2">Total PO Koperasi</h4>
-          <h2 className="text-xl sm:text-2xl font-black text-green-custom tracking-tight">Rp {formatRp(totalKoperasi)}</h2>
-        </div>
-        <div className="clay-card-in p-4 sm:p-5 flex flex-col items-center justify-center text-center">
-          <h4 className="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-wider mb-2">Total PO Supplier</h4>
-          <h2 className="text-xl sm:text-2xl font-black text-red-500 tracking-tight">Rp {formatRp(totalSupplier)}</h2>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div className="clay-card-blue p-4 sm:p-6 flex flex-col items-center justify-center text-center">
-          <h3 className="font-extrabold text-white text-xs sm:text-sm mb-1 tracking-tight">SISA PAGU</h3>
-          <p className="text-[10px] sm:text-xs font-medium text-white/80 mb-3 sm:mb-4 tracking-wide">Pagu BB - PO SPPG</p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">Rp {formatRp(marginPaguSppg)}</h1>
-        </div>
-        <div className="clay-card-blue p-4 sm:p-6 flex flex-col items-center justify-center text-center" style={{ background: '#548CA8' }}>
-          <h3 className="font-extrabold text-white text-xs sm:text-sm mb-1 tracking-tight">MARGIN UTAMA</h3>
-          <p className="text-[10px] sm:text-xs font-medium text-white/80 mb-3 sm:mb-4 tracking-wide">SPPG - Supplier</p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">Rp {formatRp(marginUtama)}</h1>
-          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 mt-3 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[10px] sm:text-xs backdrop-blur-sm shadow-sm">
+        <div className="clay-card-blue p-3 sm:p-6 flex flex-col items-center justify-center text-center" style={{ background: '#548CA8' }}>
+          <h3 className="font-extrabold text-white text-[11px] sm:text-sm mb-0.5 sm:mb-1 tracking-tight leading-tight">MARGIN UTAMA</h3>
+          <p className="text-[9px] sm:text-xs font-medium text-white/80 mb-2 sm:mb-4 tracking-wide leading-none">SPPG - Supplier</p>
+          <h1 className="text-lg sm:text-3xl font-black text-white tracking-tighter leading-none">Rp {formatRp(marginUtama)}</h1>
+          <div className="inline-block px-2 sm:px-4 py-0.5 sm:py-1.5 mt-2 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[9px] sm:text-xs backdrop-blur-sm shadow-sm">
             {persentaseUtama.toFixed(1)}%
           </div>
         </div>
-        <div className="clay-card-green p-4 sm:p-6 flex flex-col items-center justify-center text-center">
-          <h3 className="font-extrabold text-white text-xs sm:text-sm mb-1 tracking-tight">MARGIN KOPERASI</h3>
-          <p className="text-[10px] sm:text-xs font-medium text-white/80 mb-3 sm:mb-4 tracking-wide">SPPG - Koperasi</p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">Rp {formatRp(marginKoperasi)}</h1>
-          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 mt-3 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[10px] sm:text-xs backdrop-blur-sm shadow-sm">
+        <div className="clay-card-green p-3 sm:p-6 flex flex-col items-center justify-center text-center">
+          <h3 className="font-extrabold text-white text-[11px] sm:text-sm mb-0.5 sm:mb-1 tracking-tight leading-tight">MARGIN KOPERASI</h3>
+          <p className="text-[9px] sm:text-xs font-medium text-white/80 mb-2 sm:mb-4 tracking-wide leading-none">SPPG - Koperasi</p>
+          <h1 className="text-lg sm:text-3xl font-black text-white tracking-tighter leading-none">Rp {formatRp(marginKoperasi)}</h1>
+          <div className="inline-block px-2 sm:px-4 py-0.5 sm:py-1.5 mt-2 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[9px] sm:text-xs backdrop-blur-sm shadow-sm">
             {persentaseKoperasi.toFixed(1)}%
           </div>
         </div>
-        <div className="clay-card-emerald p-4 sm:p-6 flex flex-col items-center justify-center text-center">
-          <h3 className="font-extrabold text-white text-xs sm:text-sm mb-1 tracking-tight">MARGIN YAYASAN</h3>
-          <p className="text-[10px] sm:text-xs font-medium text-white/80 mb-3 sm:mb-4 tracking-wide">Koperasi - Supplier</p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">Rp {formatRp(marginYayasan)}</h1>
-          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 mt-3 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[10px] sm:text-xs backdrop-blur-sm shadow-sm">
+        <div className="clay-card-emerald p-3 sm:p-6 flex flex-col items-center justify-center text-center">
+          <h3 className="font-extrabold text-white text-[11px] sm:text-sm mb-0.5 sm:mb-1 tracking-tight leading-tight">MARGIN YAYASAN</h3>
+          <p className="text-[9px] sm:text-xs font-medium text-white/80 mb-2 sm:mb-4 tracking-wide leading-none">Koperasi - Supplier</p>
+          <h1 className="text-lg sm:text-3xl font-black text-white tracking-tighter leading-none">Rp {formatRp(marginYayasan)}</h1>
+          <div className="inline-block px-2 sm:px-4 py-0.5 sm:py-1.5 mt-2 sm:mt-4 bg-white/20 text-white rounded-full font-bold text-[9px] sm:text-xs backdrop-blur-sm shadow-sm">
             {persentaseYayasan.toFixed(1)}%
           </div>
         </div>
@@ -397,12 +314,6 @@ export function AdminDashboard() {
       <div className="clay-card p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
           <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg">GRAFIK MARGIN UTAMA PER DAPUR</h3>
-          <button 
-            onClick={handlePrint}
-            className="clay-btn blue px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold flex items-center gap-1.5 shrink-0"
-          >
-            <Printer className="w-3 h-3 sm:w-4 sm:h-4" /> Cetak
-          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
@@ -658,44 +569,44 @@ export function AdminDashboard() {
                   </button>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm mb-4">
+                <div className="grid grid-cols-2 gap-x-2 gap-y-2 text-sm mb-3">
                   <div>
-                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Total Pagu</span>
-                    <span className="font-semibold text-blue-custom text-sm">Rp {formatRp(row.pagu)}</span>
+                    <span className="text-[9px] text-gray-500 uppercase font-bold block mb-0.5">Total Pagu</span>
+                    <span className="font-semibold text-blue-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.pagu)}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Sisa Pagu</span>
-                    <span className="font-bold text-blue-custom text-sm">Rp {formatRp(sisaPagu)}</span>
+                    <span className="text-[9px] text-gray-500 uppercase font-bold block mb-0.5">Sisa Pagu</span>
+                    <span className="font-bold text-blue-custom text-xs sm:text-sm leading-none">Rp {formatRp(sisaPagu)}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO SPPG</span>
-                    <span className="font-semibold text-blue-custom text-sm">Rp {formatRp(row.po_sppg)}</span>
+                    <span className="text-[9px] text-gray-500 uppercase font-bold block mb-0.5">PO SPPG</span>
+                    <span className="font-semibold text-blue-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.po_sppg)}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO Koperasi</span>
-                    <span className="font-semibold text-green-custom text-sm">Rp {formatRp(row.po_koperasi)}</span>
+                    <span className="text-[9px] text-gray-500 uppercase font-bold block mb-0.5">PO Koperasi</span>
+                    <span className="font-semibold text-green-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.po_koperasi)}</span>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">PO Supplier</span>
-                    <span className="font-semibold text-red-500 text-sm">Rp {formatRp(row.po_supplier)}</span>
+                    <span className="text-[9px] text-gray-500 uppercase font-bold block mb-0.5">PO Supplier</span>
+                    <span className="font-semibold text-red-500 text-xs sm:text-sm leading-none">Rp {formatRp(row.po_supplier)}</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 text-center clay-card-in p-2 sm:p-3">
+                <div className="grid grid-cols-3 gap-1 text-center clay-card-in p-2">
                   <div className="flex flex-col items-center justify-center">
-                     <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Utama</span>
-                     <span className="font-black text-blue-custom text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(row.marginUtama)}</span>
-                     <span className="text-[9px] sm:text-[10px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md inline-block">{row.persentaseUtama}%</span>
+                     <span className="text-[8px] sm:text-[9px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Utama</span>
+                     <span className="font-black text-blue-custom text-[10px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginUtama)}</span>
+                     <span className="text-[8px] sm:text-[9px] font-bold bg-blue-100 text-blue-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseUtama}%</span>
                   </div>
                   <div className="flex flex-col items-center justify-center border-l border-r border-black/5">
-                     <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Koperasi</span>
-                     <span className="font-black text-green-600 text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(row.marginKoperasi)}</span>
-                     <span className="text-[9px] sm:text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-md inline-block">{row.persentaseKoperasi}%</span>
+                     <span className="text-[8px] sm:text-[9px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Koperasi</span>
+                     <span className="font-black text-green-600 text-[10px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginKoperasi)}</span>
+                     <span className="text-[8px] sm:text-[9px] font-bold bg-green-100 text-green-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseKoperasi}%</span>
                   </div>
                   <div className="flex flex-col items-center justify-center">
-                     <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Yayasan</span>
-                     <span className="font-black text-emerald-600 text-xs sm:text-sm block leading-none mb-1">Rp {formatRp(row.marginYayasan)}</span>
-                     <span className="text-[9px] sm:text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md inline-block">{row.persentaseYayasan}%</span>
+                     <span className="text-[8px] sm:text-[9px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Yayasan</span>
+                     <span className="font-black text-emerald-600 text-[10px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginYayasan)}</span>
+                     <span className="text-[8px] sm:text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseYayasan}%</span>
                   </div>
                 </div>
               </div>
