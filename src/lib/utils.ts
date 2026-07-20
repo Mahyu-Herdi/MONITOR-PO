@@ -7,8 +7,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// URL Apps Script
-export const GAS_URL = "https://script.google.com/macros/s/AKfycbyPXN27fzLtNSqzPC9N88LYMJeQdSRmbnRCbVrKxzrdzYvJlg4e8kOWBNa6JDmOvjps/exec"; 
+// URL Apps Script (Proxied through backend to avoid browser CORS/sandbox "Failed to fetch" errors)
+export const GAS_URL = "/api/proxy"; 
 
 // Format number to currency (IDR logic with dots)
 export const formatRp = (num: number) => {
@@ -19,6 +19,30 @@ export const formatRp = (num: number) => {
 export const parseRp = (str: string) => {
   if (!str) return 0;
   return parseFloat(str.replace(/\./g, '')) || 0;
+};
+
+// Robust helper to parse number from any input format
+export const parseNumber = (val: any) => {
+  if (val === undefined || val === null) return 0;
+  if (typeof val === 'number') return val;
+  const cleaned = String(val).replace(/[^0-9.-]+/g, "");
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
+};
+
+// Robust helper to parse PM/Insentif count, converting Excel/Sheets date serial number representation if needed
+export const parsePM = (val: any): number => {
+  const num = parseNumber(val);
+  // If it's a huge negative number corresponding to the 1900-1930 date range (e.g. -1949987232000)
+  if (num < -1000000000000 && num > -2209161600000) {
+    // Convert timestamp back to Google Sheets serial number (days since 1899-12-30)
+    // Dec 30 1899 UTC is -2209161600000
+    const sheetEpoch = -2209161600000;
+    const diffMs = num - sheetEpoch;
+    // Convert to days and round to the nearest integer
+    return Math.round(diffMs / 86400000);
+  }
+  return num;
 };
 
 // Utility to print HTML content using a hidden iframe
