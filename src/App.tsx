@@ -37,6 +37,7 @@ export default function App() {
   const handleAppLogout = () => {
     setAppAuthenticated(false);
     localStorage.removeItem('app_authenticated');
+    localStorage.removeItem('admin_authenticated');
     setAppPassword('');
     setRole('GUEST');
     localStorage.setItem('app_role', 'GUEST');
@@ -107,6 +108,7 @@ export default function App() {
       const data = await res.json();
       
       if (data.success) {
+        localStorage.setItem('admin_authenticated', 'true');
         handleSetRole('ADMIN');
         setShowAdminLogin(false);
         setAdminPassword('');
@@ -179,7 +181,13 @@ export default function App() {
                   <LogIn className="w-4 h-4" /> Masuk Operator
                 </button>
                 <button 
-                  onClick={() => setShowAdminLogin(true)}
+                  onClick={() => {
+                    if (localStorage.getItem('admin_authenticated') === 'true') {
+                      handleSetRole('ADMIN');
+                    } else {
+                      setShowAdminLogin(true);
+                    }
+                  }}
                   className="neo-btn green px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm flex items-center gap-2"
                 >
                   <Lock className="w-4 h-4" /> Masuk Admin
@@ -187,7 +195,13 @@ export default function App() {
             </>
           ) : (
             <button 
-              onClick={() => { handleSetRole('GUEST'); setShowAdminLogin(false); }}
+              onClick={() => { 
+                if (role === 'ADMIN') {
+                  localStorage.removeItem('admin_authenticated');
+                }
+                handleSetRole('GUEST'); 
+                setShowAdminLogin(false); 
+              }}
               className="neo-btn red px-4 py-2.5 text-xs sm:text-sm flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" /> {showAdminLogin && role === 'GUEST' ? 'KEMBALI' : 'KELUAR'}
