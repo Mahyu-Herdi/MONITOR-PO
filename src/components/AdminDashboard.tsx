@@ -13,7 +13,7 @@ const formatDate = (dateStr: string) => {
 };
 
 export function AdminDashboard() {
-  const { showAlert } = useAlert();
+  const { showAlert, showConfirm } = useAlert();
   const [data, setData] = useState<any[]>([]);
   const [opsData, setOpsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +30,7 @@ export function AdminDashboard() {
   const [editingOpsId, setEditingOpsId] = useState<string | number | null>(null);
   const [editOpsForm, setEditOpsForm] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [actionTargetId, setActionTargetId] = useState<string | number | null>(null);
   const [showFilter, setShowFilter] = useState(true);
   const [bagiHasilPersen, setBagiHasilPersen] = useState<number | ''>(0);
 
@@ -41,28 +42,58 @@ export function AdminDashboard() {
     setPreviewUrl(embedUrl);
   };
 
-  const handleDelete = async (id: string | number) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
-    
-    setIsSaving(true);
-    try {
-      if (GAS_URL) {
-        const formDataParams = new URLSearchParams();
-        formDataParams.append('action', 'delete');
-        formDataParams.append('id', id.toString());
+  const handleDelete = (id: string | number) => {
+    showConfirm('Apakah Anda yakin ingin menghapus data distribusi ini?', async () => {
+      setIsSaving(true);
+      setActionTargetId(id);
+      try {
+        if (GAS_URL) {
+          const formDataParams = new URLSearchParams();
+          formDataParams.append('action', 'delete');
+          formDataParams.append('id', id.toString());
+          
+          await fetch(GAS_URL, {
+            method: 'POST',
+            body: formDataParams
+          });
+        }
         
-        await fetch(GAS_URL, {
-          method: 'POST',
-          body: formDataParams
-        });
+        setData(prev => prev.filter(item => item.id !== id));
+        showAlert('Data berhasil dihapus', 'success');
+      } catch (err) {
+        showAlert('Gagal menghapus data', 'error');
+      } finally {
+        setIsSaving(false);
+        setActionTargetId(null);
       }
-      
-      setData(prev => prev.filter(item => item.id !== id));
-    } catch (err) {
-      showAlert('Gagal menghapus data');
-    } finally {
-      setIsSaving(false);
-    }
+    });
+  };
+
+  const handleDeleteOps = (id: string | number) => {
+    showConfirm('Apakah Anda yakin ingin menghapus data operasional ini?', async () => {
+      setIsSaving(true);
+      setActionTargetId(id);
+      try {
+        if (GAS_URL) {
+          const formDataParams = new URLSearchParams();
+          formDataParams.append('action', 'delete_ops');
+          formDataParams.append('id', id.toString());
+          
+          await fetch(GAS_URL, {
+            method: 'POST',
+            body: formDataParams
+          });
+        }
+        
+        setOpsData(prev => prev.filter(item => item.id !== id));
+        showAlert('Data operasional berhasil dihapus', 'success');
+      } catch (err) {
+        showAlert('Gagal menghapus data operasional', 'error');
+      } finally {
+        setIsSaving(false);
+        setActionTargetId(null);
+      }
+    });
   };
 
   const handleEditStart = (row: any) => {
@@ -94,6 +125,7 @@ export function AdminDashboard() {
 
   const handleEditSave = async () => {
     setIsSaving(true);
+    setActionTargetId(editingId);
     try {
       if (GAS_URL) {
         const formDataParams = new URLSearchParams();
@@ -129,6 +161,7 @@ export function AdminDashboard() {
       showAlert('Gagal menyimpan data');
     } finally {
       setIsSaving(false);
+      setActionTargetId(null);
     }
   };
 
@@ -151,6 +184,7 @@ export function AdminDashboard() {
 
   const handleOpsEditSave = async () => {
     setIsSaving(true);
+    setActionTargetId(editingOpsId);
     try {
       if (GAS_URL) {
         const formDataParams = new URLSearchParams();
@@ -192,6 +226,7 @@ export function AdminDashboard() {
       showAlert('Gagal menyimpan data ops');
     } finally {
       setIsSaving(false);
+      setActionTargetId(null);
     }
   };
 
@@ -918,8 +953,8 @@ export function AdminDashboard() {
                         <button onClick={() => handleEditStart(row)} className="p-1.5 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200" title="Edit">
                           <Edit2 className="w-4 h-4"/>
                         </button>
-                        <button onClick={() => handleDelete(row.id)} className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200" title="Hapus">
-                          <Trash2 className="w-4 h-4"/>
+                        <button disabled={isSaving} onClick={() => handleDelete(row.id)} className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center min-w-[32px]" title="Hapus">
+                          {isSaving && actionTargetId === row.id ? <Loader2 className="w-4 h-4 animate-spin"/> : <Trash2 className="w-4 h-4"/>}
                         </button>
                       </div>
                     </div>
@@ -1037,8 +1072,8 @@ export function AdminDashboard() {
                         <button onClick={() => handleOpsEditStart(row)} className="p-1.5 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200" title="Edit">
                           <Edit2 className="w-4 h-4"/>
                         </button>
-                        <button onClick={() => handleDelete(row.id)} className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200" title="Hapus">
-                          <Trash2 className="w-4 h-4"/>
+                        <button disabled={isSaving} onClick={() => handleDeleteOps(row.id)} className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center min-w-[32px]" title="Hapus">
+                          {isSaving && actionTargetId === row.id ? <Loader2 className="w-4 h-4 animate-spin"/> : <Trash2 className="w-4 h-4"/>}
                         </button>
                       </div>
                     </div>
