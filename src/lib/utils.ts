@@ -7,8 +7,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// URL Apps Script (Proxied through backend to avoid browser CORS/sandbox "Failed to fetch" errors)
-export const GAS_URL = "/api/proxy"; 
+// URL Apps Script (Proxied through backend to avoid browser CORS/sandbox "Failed to fetch" errors in AI Studio)
+const ACTUAL_GAS_URL = "https://script.google.com/macros/s/AKfycbwHMFb-zRZb-13NebtoGW_MxVMuynd4qEIrKY6uUPF_ulbyVX5bSW7t1SjV2uqRFoe2/exec";
+
+// Jika dijalankan di Vercel/GitHub (port bukan 3000), bypass proxy server local dan panggil langsung URL Google Apps Script.
+export const GAS_URL = (typeof window !== "undefined" && window.location.port !== "3000")
+  ? ACTUAL_GAS_URL
+  : "/api/proxy"; 
 
 // Format number to currency (IDR logic with dots)
 export const formatRp = (num: number) => {
