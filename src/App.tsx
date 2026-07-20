@@ -76,7 +76,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-6 pb-24 w-full max-w-[1600px] mx-auto">
+    <div className="min-h-screen p-4 md:p-6 pb-24 w-full xl:max-w-none xl:px-12 mx-auto">
       {/* HEADER */}
       <header className="neo-card p-4 md:p-6 mb-6 md:mb-8 w-full relative flex flex-col lg:flex-row items-center justify-center gap-4">
         <div className="hidden lg:block lg:flex-1"></div>

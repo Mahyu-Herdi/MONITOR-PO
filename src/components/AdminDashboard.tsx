@@ -313,94 +313,176 @@ export function AdminDashboard() {
         </div>
       </div>
 
-      <div className="neo-card p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
-          <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg">GRAFIK MARGIN UTAMA PER DAPUR</h3>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-          <div className="h-64 sm:h-80 lg:h-[28rem] w-full relative lg:col-span-2" id="pie-chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  dataKey="marginUtama"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius="75%"
-                  innerRadius="45%"
-                  paddingAngle={2}
-                  onClick={(entry) => setSelectedDapur(entry.name)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number, name: string, props: any) => [`Rp ${formatRp(value)} (${props.payload.persentaseUtama}%)`, name]} />
-                <Legend verticalAlign="bottom" />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute top-0 right-0 p-2 text-[10px] sm:text-xs font-bold text-muted pointer-events-none">
-              *Klik grafik untuk lihat rincian
-            </div>
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        {/* LEFT PANEL: CHART & METRICS */}
+        <div className="xl:col-span-5 neo-card p-4 sm:p-6 h-full flex flex-col justify-between">
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
+            <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg">GRAFIK MARGIN UTAMA PER DAPUR</h3>
           </div>
 
-          <div className="flex flex-col gap-2 sm:gap-3 w-full">
-            {chartData.length > 0 && (
-              <>
-                <div className="neo-box p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 shadow-inner">
-                      <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
-                    </div>
-                    <div>
-                      <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Margin Tertinggi</h4>
-                      <p className="text-[10px] sm:text-xs font-black text-green-700 leading-tight">{chartData[0].name}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs sm:text-sm font-black text-green-700">{chartData[0].persentaseUtama}%</span>
-                  </div>
-                </div>
-
-                <div className="neo-box p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 shadow-inner">
-                      <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
-                    </div>
-                    <div>
-                      <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Margin Terendah</h4>
-                      <p className="text-[10px] sm:text-xs font-black text-red-600 leading-tight">{chartData[chartData.length - 1].name}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs sm:text-sm font-black text-red-600">{chartData[chartData.length - 1].persentaseUtama}%</span>
-                  </div>
-                </div>
-
-                <div className="neo-box p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 shadow-inner">
-                      <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-blue-custom" />
-                    </div>
-                    <div>
-                      <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Rata-Rata Margin</h4>
-                      <p className="text-[10px] sm:text-xs font-black text-blue-custom leading-tight">Seluruh Dapur</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs sm:text-sm font-black text-blue-custom">{persentaseUtama.toFixed(2)}%</span>
-                  </div>
-                </div>
-              </>
-            )}
-            {chartData.length === 0 && (
-              <div className="text-center p-4 text-muted text-sm font-bold">
-                Belum ada data distribusi.
+          <div className="flex flex-col gap-6">
+            <div className="h-64 sm:h-80 xl:h-[24rem] w-full relative" id="pie-chart-container">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    dataKey="marginUtama"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius="75%"
+                    innerRadius="45%"
+                    paddingAngle={2}
+                    onClick={(entry) => setSelectedDapur(entry.name)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number, name: string, props: any) => [`Rp ${formatRp(value)} (${props.payload.persentaseUtama}%)`, name]} />
+                  <Legend verticalAlign="bottom" />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute top-0 right-0 p-2 text-[10px] sm:text-xs font-bold text-muted pointer-events-none">
+                *Klik grafik untuk lihat rincian
               </div>
+            </div>
+
+            <div className="flex flex-col gap-2 sm:gap-3 w-full">
+              {chartData.length > 0 && (
+                <>
+                  <div className="neo-box p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                        <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                      </div>
+                      <div>
+                        <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Margin Tertinggi</h4>
+                        <p className="text-[10px] sm:text-xs font-black text-green-700 leading-tight">{chartData[0].name}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs sm:text-sm font-black text-green-700">{chartData[0].persentaseUtama}%</span>
+                    </div>
+                  </div>
+
+                  <div className="neo-box p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                        <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Margin Terendah</h4>
+                        <p className="text-[10px] sm:text-xs font-black text-red-600 leading-tight">{chartData[chartData.length - 1].name}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs sm:text-sm font-black text-red-600">{chartData[chartData.length - 1].persentaseUtama}%</span>
+                    </div>
+                  </div>
+
+                  <div className="neo-box p-2 sm:p-3 flex items-center justify-between gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                        <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-blue-custom" />
+                      </div>
+                      <div>
+                        <h4 className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase">Rata-Rata Margin</h4>
+                        <p className="text-[10px] sm:text-xs font-black text-blue-custom leading-tight">Seluruh Dapur</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs sm:text-sm font-black text-blue-custom">{persentaseUtama.toFixed(2)}%</span>
+                    </div>
+                  </div>
+                </>
+              )}
+              {chartData.length === 0 && (
+                <div className="text-center p-4 text-muted text-sm font-bold">
+                  Belum ada data distribusi.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT PANEL: RECAPITULATION TABLE/CARDS */}
+        <div className="xl:col-span-7 neo-card p-3 sm:p-6 overflow-hidden">
+          <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg mb-3 sm:mb-4 text-center sm:text-left">TABEL REKAPITULASI TOTAL PER DAPUR</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            {chartData.map((row: any, i) => {
+              const sisaPagu = row.pagu - row.po_sppg;
+              return (
+                <div 
+                  key={row.name} 
+                  className="neo-box p-2.5 sm:p-4 cursor-pointer hover:bg-black/5 transition-colors flex flex-col justify-between"
+                  onClick={() => setSelectedDapur(row.name)}
+                >
+                  <div className="flex justify-between items-start mb-2 sm:mb-4 border-b border-black/5 pb-2 sm:pb-3">
+                    <div>
+                      <div className="font-bold text-blue-custom text-xs sm:text-sm leading-none mb-1">{row.name}</div>
+                      <div className="text-[9px] sm:text-[10px] text-muted font-semibold leading-none">{row.count} Transaksi</div>
+                    </div>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setSelectedDapur(row.name); }}
+                      className="px-2 py-1 bg-blue-100 text-blue-custom rounded-lg font-bold text-[9px] sm:text-xs hover:bg-blue-200 transition-colors shadow-sm leading-none"
+                    >
+                      Rincian
+                    </button>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 text-xs sm:text-sm mb-3 sm:mb-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-gray-500 uppercase font-bold block leading-none">Total Pagu</span>
+                      <span className="font-black text-blue-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.pagu)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-gray-500 uppercase font-bold block leading-none">PO SPPG</span>
+                      <span className="font-black text-blue-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.po_sppg)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-gray-500 uppercase font-bold block leading-none">Sisa Pagu</span>
+                      <span className={`font-black text-xs sm:text-sm leading-none ${sisaPagu < 0 ? 'text-red-500' : 'text-blue-custom'}`}>Rp {formatRp(sisaPagu)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-gray-500 uppercase font-bold block leading-none">PO Koperasi</span>
+                      <span className="font-black text-green-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.po_koperasi)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-gray-500 uppercase font-bold block leading-none">PO Supplier</span>
+                      <span className="font-black text-red-500 text-xs sm:text-sm leading-none">Rp {formatRp(row.po_supplier)}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-0.5 text-center neo-box p-1 sm:p-1.5 mt-auto">
+                    <div className="flex flex-col items-center justify-center">
+                       <span className="text-[7px] sm:text-[8px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Mar. Utama</span>
+                       <span className="font-black text-blue-custom text-[9px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginUtama)}</span>
+                       <span className="text-[7px] sm:text-[8px] font-bold bg-blue-100 text-blue-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseUtama}%</span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center border-l border-r border-black/5">
+                       <span className="text-[7px] sm:text-[8px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Mar. Kop.</span>
+                       <span className="font-black text-green-600 text-[9px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginKoperasi)}</span>
+                       <span className="text-[7px] sm:text-[8px] font-bold bg-green-100 text-green-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseKoperasi}%</span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center">
+                       <span className="text-[7px] sm:text-[8px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Mar. Yay.</span>
+                       <span className="font-black text-emerald-600 text-[9px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginYayasan)}</span>
+                       <span className="text-[7px] sm:text-[8px] font-bold bg-emerald-100 text-emerald-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseYayasan}%</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {chartData.length === 0 && (
+              <div className="p-8 text-center text-muted font-bold neo-box col-span-2">Belum ada data distribusi.</div>
             )}
+          </div>
+
+          <div className="mt-4 text-xs font-bold text-muted text-center sm:text-left">
+            *Klik kartu atau baris dapur untuk melihat rincian dan mengunduh dokumen.
           </div>
         </div>
       </div>
@@ -546,84 +628,6 @@ export function AdminDashboard() {
           </div>
         </div>
       )}
-
-      <div className="neo-card p-3 sm:p-6 overflow-hidden">
-        <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg mb-3 sm:mb-4 text-center sm:text-left">TABEL REKAPITULASI TOTAL PER DAPUR</h3>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-          {chartData.map((row: any, i) => {
-            const sisaPagu = row.pagu - row.po_sppg;
-            return (
-              <div 
-                key={row.name} 
-                className="neo-box p-2.5 sm:p-4 cursor-pointer hover:bg-black/5 transition-colors"
-                onClick={() => setSelectedDapur(row.name)}
-              >
-                <div className="flex justify-between items-start mb-2 sm:mb-4 border-b border-black/5 pb-2 sm:pb-3">
-                  <div>
-                    <div className="font-bold text-blue-custom text-sm sm:text-base leading-none mb-1">{row.name}</div>
-                    <div className="text-[10px] sm:text-xs text-muted font-semibold leading-none">{row.count} Transaksi</div>
-                  </div>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setSelectedDapur(row.name); }}
-                    className="px-2 py-1 bg-blue-100 text-blue-custom rounded-lg font-bold text-[9px] sm:text-xs hover:bg-blue-200 transition-colors shadow-sm leading-none"
-                  >
-                    Rincian
-                  </button>
-                </div>
-                
-                <div className="flex flex-col gap-2 text-sm mb-3 sm:mb-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] sm:text-xs text-gray-500 uppercase font-bold block leading-none">Total Pagu</span>
-                    <span className="font-black text-blue-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.pagu)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] sm:text-xs text-gray-500 uppercase font-bold block leading-none">PO SPPG</span>
-                    <span className="font-black text-blue-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.po_sppg)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] sm:text-xs text-gray-500 uppercase font-bold block leading-none">Sisa Pagu</span>
-                    <span className={`font-black text-xs sm:text-sm leading-none ${sisaPagu < 0 ? 'text-red-500' : 'text-blue-custom'}`}>Rp {formatRp(sisaPagu)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] sm:text-xs text-gray-500 uppercase font-bold block leading-none">PO Koperasi</span>
-                    <span className="font-black text-green-custom text-xs sm:text-sm leading-none">Rp {formatRp(row.po_koperasi)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] sm:text-xs text-gray-500 uppercase font-bold block leading-none">PO Supplier</span>
-                    <span className="font-black text-red-500 text-xs sm:text-sm leading-none">Rp {formatRp(row.po_supplier)}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-1 text-center neo-box p-1.5 sm:p-2">
-                  <div className="flex flex-col items-center justify-center">
-                     <span className="text-[8px] sm:text-[9px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Utama</span>
-                     <span className="font-black text-blue-custom text-[10px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginUtama)}</span>
-                     <span className="text-[8px] sm:text-[9px] font-bold bg-blue-100 text-blue-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseUtama}%</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-center border-l border-r border-black/5">
-                     <span className="text-[8px] sm:text-[9px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Koperasi</span>
-                     <span className="font-black text-green-600 text-[10px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginKoperasi)}</span>
-                     <span className="text-[8px] sm:text-[9px] font-bold bg-green-100 text-green-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseKoperasi}%</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-center">
-                     <span className="text-[8px] sm:text-[9px] text-gray-500 uppercase font-bold block mb-0.5">Mar. Yayasan</span>
-                     <span className="font-black text-emerald-600 text-[10px] sm:text-xs block leading-none mb-1">Rp {formatRp(row.marginYayasan)}</span>
-                     <span className="text-[8px] sm:text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1 py-0.5 rounded-md inline-block leading-none">{row.persentaseYayasan}%</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-          {chartData.length === 0 && (
-            <div className="p-8 text-center text-muted font-bold neo-box">Belum ada data distribusi.</div>
-          )}
-        </div>
-
-        <div className="mt-4 text-xs font-bold text-muted text-center sm:text-left">
-          *Klik kartu atau baris dapur untuk melihat rincian dan mengunduh dokumen.
-        </div>
-      </div>
 
       {previewUrl && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">

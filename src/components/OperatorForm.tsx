@@ -171,7 +171,7 @@ export function OperatorForm() {
   };
 
   return (
-    <div className="neo-card p-3 sm:p-6 w-full max-w-5xl mx-auto">
+    <div className="neo-card p-3 sm:p-6 w-full xl:max-w-none mx-auto">
       <h2 className="text-sm sm:text-xl font-extrabold text-blue-custom mb-4 flex items-center gap-2">
         <Save className="w-4 h-4 sm:w-6 sm:h-6" />
         Input Distribusi Dapur

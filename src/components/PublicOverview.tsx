@@ -1,7 +1,7 @@
 import { CustomSelect } from "./CustomSelect";
 import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
-import { formatRp, GAS_URL } from '../lib/utils';
+import { cn, formatRp, GAS_URL } from '../lib/utils';
 import { TrendingUp, TrendingDown, Activity, Loader2, Calendar as CalendarIcon, Info } from 'lucide-react';
 
 const colors = [
@@ -148,180 +148,182 @@ export function PublicOverview() {
         </button>
       </div>
 
-      <div className="neo-card p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-          <div className="text-center sm:text-left">
-            <h2 className="text-lg sm:text-xl font-black text-blue-custom tracking-tight">Performa Margin Dapur</h2>
-            <p className="text-xs font-bold text-muted mt-1">Gambaran margin utama persentase</p>
+      <div className={cn("grid grid-cols-1 gap-6 items-start", selectedDapurData ? "xl:grid-cols-12" : "xl:grid-cols-1")}>
+        <div className={cn("neo-card p-4 sm:p-6", selectedDapurData ? "xl:col-span-7" : "xl:col-span-12")}>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <div className="text-center sm:text-left">
+              <h2 className="text-lg sm:text-xl font-black text-blue-custom tracking-tight">Performa Margin Dapur</h2>
+              <p className="text-xs font-bold text-muted mt-1">Gambaran margin utama persentase</p>
+            </div>
+            
+            {showFilter && (
+              <div className="flex items-center gap-2 neo-box p-2.5 sm:p-3 min-h-[40px] animate-in fade-in zoom-in duration-200">
+                <CalendarIcon className="w-4 h-4 text-blue-custom" />
+                <CustomSelect
+                  value={selectedMonth}
+                  onChange={(val) => setSelectedMonth(val)}
+                  options={months.map(m => ({ value: m.value, label: m.label }))}
+                  variant="inline"
+                />
+                <span className="text-gray-300">|</span>
+                <CustomSelect
+                  value={selectedYear}
+                  onChange={(val) => setSelectedYear(val)}
+                  options={[currentYear, (Number(currentYear)-1).toString()].map(y => ({ value: y, label: y }))}
+                  variant="inline"
+                />
+              </div>
+            )}
           </div>
-          
-          {showFilter && (
-            <div className="flex items-center gap-2 neo-box p-2.5 sm:p-3 min-h-[40px] animate-in fade-in zoom-in duration-200">
-              <CalendarIcon className="w-4 h-4 text-blue-custom" />
-              <CustomSelect
-                value={selectedMonth}
-                onChange={(val) => setSelectedMonth(val)}
-                options={months.map(m => ({ value: m.value, label: m.label }))}
-                variant="inline"
-              />
-              <span className="text-gray-300">|</span>
-              <CustomSelect
-                value={selectedYear}
-                onChange={(val) => setSelectedYear(val)}
-                options={[currentYear, (Number(currentYear)-1).toString()].map(y => ({ value: y, label: y }))}
-                variant="inline"
-              />
+
+          {chartData.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+              <div className="lg:col-span-2 relative h-64 sm:h-80 lg:h-[28rem]" style={{ filter: 'drop-shadow(0px 10px 15px rgba(0,0,0,0.1))' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={chartData}
+                      dataKey="persentaseUtama"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius="75%"
+                      innerRadius="45%"
+                      paddingAngle={3}
+                      onClick={(entry) => setSelectedDapur(entry.name)}
+                      style={{ cursor: 'pointer' }}
+                      stroke="none"
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number, name: string) => [`${value}%`, name]}
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '8px 8px 16px #d1d5db, -8px -8px 16px #ffffff', fontWeight: 'bold' }}
+                    />
+                    <Legend verticalAlign="bottom" align="center" />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute top-0 right-0 p-2 text-[10px] font-bold text-muted pointer-events-none">
+                  *Klik area grafik untuk detail
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <div className="neo-box p-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                      <TrendingUp className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] font-bold text-gray-500 uppercase">Margin Tertinggi</h4>
+                      <p className="text-xs font-black text-green-700 leading-tight">{chartData[0].name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-black text-green-700">{chartData[0].persentaseUtama}%</span>
+                  </div>
+                </div>
+
+                <div className="neo-box p-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                      <TrendingDown className="w-4 h-4 text-red-500" />
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] font-bold text-gray-500 uppercase">Margin Terendah</h4>
+                      <p className="text-xs font-black text-red-600 leading-tight">{chartData[chartData.length - 1].name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-black text-red-600">{chartData[chartData.length - 1].persentaseUtama}%</span>
+                  </div>
+                </div>
+
+                <div className="neo-box p-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                      <Activity className="w-4 h-4 text-blue-custom" />
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] font-bold text-gray-500 uppercase">Rata-Rata Margin</h4>
+                      <p className="text-xs font-black text-blue-custom leading-tight">Bulan Ini</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-black text-blue-custom">{avgMargin.toFixed(2)}%</span>
+                  </div>
+                </div>
+                
+                {!selectedDapur && (
+                   <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-2">
+                     <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                     <p className="text-[10px] sm:text-xs text-blue-700 font-medium leading-tight">
+                       Klik pada salah satu bagian pie chart untuk melihat rincian angka Pagu dan PO masing-masing dapur.
+                     </p>
+                   </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="p-8 text-center text-muted font-bold neo-box">
+              Belum ada data untuk bulan {months.find(m => m.value === selectedMonth)?.label} {selectedYear}.
             </div>
           )}
         </div>
 
-        {chartData.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-            <div className="lg:col-span-2 relative h-64 sm:h-80 lg:h-[28rem]" style={{ filter: 'drop-shadow(0px 10px 15px rgba(0,0,0,0.1))' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={chartData}
-                    dataKey="persentaseUtama"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius="75%"
-                    innerRadius="45%"
-                    paddingAngle={3}
-                    onClick={(entry) => setSelectedDapur(entry.name)}
-                    style={{ cursor: 'pointer' }}
-                    stroke="none"
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value: number, name: string) => [`${value}%`, name]}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '8px 8px 16px #d1d5db, -8px -8px 16px #ffffff', fontWeight: 'bold' }}
-                  />
-                  <Legend verticalAlign="bottom" align="center" />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute top-0 right-0 p-2 text-[10px] font-bold text-muted pointer-events-none">
-                *Klik area grafik untuk detail
+        {selectedDapurData && (
+          <div className="neo-card p-4 sm:p-6 xl:col-span-5 w-full flex flex-col justify-between animate-in slide-in-from-right-4 fade-in duration-300">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-black/5">
+              <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg">Rincian: {selectedDapurData.name}</h3>
+              <button 
+                onClick={() => setSelectedDapur(null)}
+                className="text-xs font-bold text-red-500 hover:underline px-2 py-1 bg-red-50 rounded-lg"
+              >
+                Tutup
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 mb-4 flex-1">
+              <div className="neo-box p-3 flex flex-col justify-center">
+                <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total Pagu</span>
+                <span className="font-black text-blue-custom text-xs sm:text-sm">Rp {formatRp(selectedDapurData.pagu)}</span>
+              </div>
+              <div className="neo-box p-3 flex flex-col justify-center">
+                <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total PO SPPG</span>
+                <span className="font-black text-blue-custom text-xs sm:text-sm">Rp {formatRp(selectedDapurData.po_sppg)}</span>
+              </div>
+              <div className="neo-box p-3 flex flex-col justify-center">
+                <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total PO Koperasi</span>
+                <span className="font-black text-green-custom text-xs sm:text-sm">Rp {formatRp(selectedDapurData.po_koperasi)}</span>
+              </div>
+              <div className="neo-box p-3 flex flex-col justify-center">
+                <span className="text-[10px] text-gray-500 uppercase font-bold block mb-1">Total PO Supplier</span>
+                <span className="font-black text-red-500 text-xs sm:text-sm">Rp {formatRp(selectedDapurData.po_supplier)}</span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3">
-              <div className="neo-box p-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 shadow-inner">
-                    <TrendingUp className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-bold text-gray-500 uppercase">Margin Tertinggi</h4>
-                    <p className="text-xs font-black text-green-700 leading-tight">{chartData[0].name}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-black text-green-700">{chartData[0].persentaseUtama}%</span>
-                </div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center mt-2 border-t border-black/5 pt-4">
+              <div className="neo-box p-2 flex flex-col items-center justify-center">
+                <span className="text-[8px] sm:text-[9px] text-muted uppercase font-bold block mb-1 leading-none">Margin Utama</span>
+                <span className="font-black text-blue-custom text-[10px] sm:text-xs mb-1.5 leading-none mt-1">Rp {formatRp(selectedDapurData.marginUtama)}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold bg-blue-50/50 text-blue-custom px-1.5 py-0.5 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseUtama}%</span>
               </div>
-
-              <div className="neo-box p-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 shadow-inner">
-                    <TrendingDown className="w-4 h-4 text-red-500" />
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-bold text-gray-500 uppercase">Margin Terendah</h4>
-                    <p className="text-xs font-black text-red-600 leading-tight">{chartData[chartData.length - 1].name}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-black text-red-600">{chartData[chartData.length - 1].persentaseUtama}%</span>
-                </div>
+              <div className="neo-box p-2 flex flex-col items-center justify-center">
+                <span className="text-[8px] sm:text-[9px] text-muted uppercase font-bold block mb-1 leading-none">Margin Kop.</span>
+                <span className="font-black text-green-custom text-[10px] sm:text-xs mb-1.5 leading-none mt-1">Rp {formatRp(selectedDapurData.marginKoperasi)}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold bg-green-50/50 text-green-custom px-1.5 py-0.5 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseKoperasi}%</span>
               </div>
-
-              <div className="neo-box p-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 shadow-inner">
-                    <Activity className="w-4 h-4 text-blue-custom" />
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-bold text-gray-500 uppercase">Rata-Rata Margin</h4>
-                    <p className="text-xs font-black text-blue-custom leading-tight">Bulan Ini</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-black text-blue-custom">{avgMargin.toFixed(2)}%</span>
-                </div>
+              <div className="neo-box p-2 flex flex-col items-center justify-center">
+                <span className="text-[8px] sm:text-[9px] text-muted uppercase font-bold block mb-1 leading-none">Margin Yay.</span>
+                <span className="font-black text-emerald-600 text-[10px] sm:text-xs mb-1.5 leading-none mt-1">Rp {formatRp(selectedDapurData.marginYayasan)}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold bg-emerald-50/50 text-emerald-600 px-1.5 py-0.5 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseYayasan}%</span>
               </div>
-              
-              {!selectedDapur && (
-                 <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-2">
-                   <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-                   <p className="text-[10px] sm:text-xs text-blue-700 font-medium leading-tight">
-                     Klik pada salah satu bagian pie chart untuk melihat rincian angka Pagu dan PO masing-masing dapur.
-                   </p>
-                 </div>
-              )}
             </div>
-          </div>
-        ) : (
-          <div className="p-8 text-center text-muted font-bold neo-box">
-            Belum ada data untuk bulan {months.find(m => m.value === selectedMonth)?.label} {selectedYear}.
           </div>
         )}
       </div>
-
-      {selectedDapurData && (
-        <div className="neo-card p-3 sm:p-6 animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-extrabold text-blue-custom text-sm sm:text-lg">Rincian: {selectedDapurData.name}</h3>
-            <button 
-              onClick={() => setSelectedDapur(null)}
-              className="text-[10px] sm:text-xs font-bold text-red-500 hover:underline"
-            >
-              Tutup
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-4 mb-3">
-            <div className="neo-box p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
-              <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total Pagu</span>
-              <span className="font-black text-blue-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.pagu)}</span>
-            </div>
-            <div className="neo-box p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
-              <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO SPPG</span>
-              <span className="font-black text-blue-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_sppg)}</span>
-            </div>
-            <div className="neo-box p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
-              <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO Koperasi</span>
-              <span className="font-black text-green-custom text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_koperasi)}</span>
-            </div>
-            <div className="neo-box p-2 min-h-[50px] sm:min-h-0 flex flex-col justify-center">
-              <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase font-bold block mb-0.5 leading-none">Total PO Supplier</span>
-              <span className="font-black text-red-500 text-[11px] sm:text-sm leading-none mt-1">Rp {formatRp(selectedDapurData.po_supplier)}</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center mt-4">
-            <div className="neo-box p-3 sm:p-4 flex flex-col items-center justify-center">
-              <span className="text-[9px] sm:text-[10px] text-muted uppercase font-bold block mb-1 leading-none">Margin Utama</span>
-              <span className="font-black text-blue-custom text-[11px] sm:text-lg mb-2 leading-none mt-1">Rp {formatRp(selectedDapurData.marginUtama)}</span>
-              <span className="text-[9px] sm:text-[10px] font-bold bg-blue-50/50 text-blue-custom px-2 py-1 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseUtama}%</span>
-            </div>
-            <div className="neo-box p-3 sm:p-4 flex flex-col items-center justify-center">
-              <span className="text-[9px] sm:text-[10px] text-muted uppercase font-bold block mb-1 leading-none">Margin Koperasi</span>
-              <span className="font-black text-green-custom text-[11px] sm:text-lg mb-2 leading-none mt-1">Rp {formatRp(selectedDapurData.marginKoperasi)}</span>
-              <span className="text-[9px] sm:text-[10px] font-bold bg-green-50/50 text-green-custom px-2 py-1 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseKoperasi}%</span>
-            </div>
-            <div className="neo-box p-3 sm:p-4 flex flex-col items-center justify-center">
-              <span className="text-[9px] sm:text-[10px] text-muted uppercase font-bold block mb-1 leading-none">Margin Yayasan</span>
-              <span className="font-black text-emerald-600 text-[11px] sm:text-lg mb-2 leading-none mt-1">Rp {formatRp(selectedDapurData.marginYayasan)}</span>
-              <span className="text-[9px] sm:text-[10px] font-bold bg-emerald-50/50 text-emerald-600 px-2 py-1 rounded-full leading-none shadow-sm">{selectedDapurData.persentaseYayasan}%</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
