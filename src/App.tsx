@@ -69,6 +69,7 @@ export default function App() {
       if (data.success) {
         setAppAuthenticated(true);
         localStorage.setItem('app_authenticated', 'true');
+        handleSetRole('GUEST');
       } else {
         setAppLoginError(data.message || 'Sandi aplikasi salah!');
       }
