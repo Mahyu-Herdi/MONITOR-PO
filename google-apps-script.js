@@ -296,7 +296,13 @@ function updateDashboard(ss) {
   if (!sheetDist) return;
 
   var data = sheetDist.getDataRange().getValues();
-  if (data.length <= 1) return;
+  if (data.length <= 1) {
+    var lastRow = sheetDash.getLastRow();
+    if (lastRow > 1) {
+      sheetDash.getRange(2, 1, lastRow - 1, 9).clearContent();
+    }
+    return;
+  }
 
   var headers = data[0];
   var dapurIdx = headers.indexOf("DAPUR");

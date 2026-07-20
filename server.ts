@@ -26,7 +26,7 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "100mb", extended: true }));
 
   // The actual Google Apps Script Web App URL
-  const ACTUAL_GAS_URL = "https://script.google.com/macros/s/AKfycbwHMFb-zRZb-13NebtoGW_MxVMuynd4qEIrKY6uUPF_ulbyVX5bSW7t1SjV2uqRFoe2/exec";
+  const ACTUAL_GAS_URL = "https://script.google.com/macros/s/AKfycbw3lNBtfDIPrEe3Wj51stpW3xIHxp05sHQiSXzScxZKqCZes2pvcn4SVcKoCs3NWFZV/exec";
 
   // Proxy endpoint to bypass CORS and sandboxed iframe fetch limitations
   app.all("/api/proxy", async (req, res) => {

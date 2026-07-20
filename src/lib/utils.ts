@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // URL Apps Script (Proxied through backend to avoid browser CORS/sandbox "Failed to fetch" errors in AI Studio)
-const ACTUAL_GAS_URL = "https://script.google.com/macros/s/AKfycbwHMFb-zRZb-13NebtoGW_MxVMuynd4qEIrKY6uUPF_ulbyVX5bSW7t1SjV2uqRFoe2/exec";
+const ACTUAL_GAS_URL = "https://script.google.com/macros/s/AKfycbw3lNBtfDIPrEe3Wj51stpW3xIHxp05sHQiSXzScxZKqCZes2pvcn4SVcKoCs3NWFZV/exec";
 
 // Jika dijalankan di Vercel/GitHub (port bukan 3000), bypass proxy server local dan panggil langsung URL Google Apps Script.
 export const GAS_URL = (typeof window !== "undefined" && window.location.port !== "3000")
