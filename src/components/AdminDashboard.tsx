@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 import { formatRp, GAS_URL, parseRp, parseNumber, parsePM } from '../lib/utils';
 import { useAlert } from "./AlertProvider";
+import { CustomDatePicker } from "./CustomDatePicker";
 import { FileText, FileSpreadsheet, X, Calendar as CalendarIcon, TrendingUp, TrendingDown, Activity, Edit2, Trash2, Save, XCircle, Loader2 } from 'lucide-react';
 
 const formatDate = (dateStr: string) => {
@@ -436,18 +437,18 @@ export function AdminDashboard() {
             <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Filter Rentang Waktu:
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <input 
-              type="date" 
+            <CustomDatePicker 
               value={startDate} 
-              onChange={(e) => setStartDate(e.target.value)}
-              className="p-2 sm:p-2.5 rounded-xl border border-black/10 outline-none font-bold text-xs bg-white shadow-sm w-full sm:w-auto min-h-[36px]"
+              onChange={setStartDate}
+              className="p-2 sm:p-2.5 rounded-xl border border-black/10 outline-none font-bold text-xs bg-white shadow-sm w-full sm:w-[150px] min-h-[36px]"
+              placeholder="Pilih Tanggal"
             />
             <span className="font-bold text-muted whitespace-nowrap text-[10px] sm:text-xs">S/D <span className="text-[9px] font-normal opacity-70">(Kosongkan untuk 1 hari)</span></span>
-            <input 
-              type="date" 
+            <CustomDatePicker 
               value={endDate} 
-              onChange={(e) => setEndDate(e.target.value)}
-              className="p-2 sm:p-2.5 rounded-xl border border-black/10 outline-none font-bold text-xs bg-white shadow-sm w-full sm:w-auto min-h-[36px]"
+              onChange={setEndDate}
+              className="p-2 sm:p-2.5 rounded-xl border border-black/10 outline-none font-bold text-xs bg-white shadow-sm w-full sm:w-[150px] min-h-[36px]"
+              placeholder="Pilih Tanggal"
             />
             {(startDate || endDate) && (
               <button 

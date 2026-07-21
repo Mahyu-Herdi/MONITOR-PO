@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAlert } from "./AlertProvider";
 import { CustomSelect } from "./CustomSelect";
+import { CustomDatePicker } from "./CustomDatePicker";
 import { Upload, Save, FileText, FileSpreadsheet, Loader2, ArrowLeft, Briefcase, Truck } from 'lucide-react';
 import { cn, formatRp, parseRp, GAS_URL } from '../lib/utils';
 
@@ -368,13 +369,11 @@ export function OperatorForm() {
               </div>
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Tanggal Ops</label>
-                <input 
-                  type="date" 
-                  name="dist_date"
-                  required
+                <CustomDatePicker 
                   value={opsFormData.dist_date}
-                  onChange={handleOpsChange}
-                  className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-sm sm:text-base min-h-[48px]" 
+                  onChange={(dateStr) => handleOpsChange({ target: { name: 'dist_date', value: dateStr } } as any)}
+                  required
+                  className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-sm sm:text-base min-h-[48px] bg-transparent" 
                 />
               </div>
               <div>
@@ -533,13 +532,11 @@ export function OperatorForm() {
             </div>
             <div>
               <label className="block text-xs sm:text-sm font-bold text-muted mb-2">Tanggal Distribusi</label>
-              <input 
-                type="date" 
-                name="dist_date"
-                required
+              <CustomDatePicker 
                 value={formData.dist_date}
-                onChange={handleChange}
-                className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-sm sm:text-base min-h-[48px]" 
+                onChange={(dateStr) => handleChange({ target: { name: 'dist_date', value: dateStr } } as any)}
+                required
+                className="neo-input w-full p-3 sm:p-4 rounded-xl border-none font-bold text-sm sm:text-base min-h-[48px] bg-transparent" 
               />
             </div>
           </div>
